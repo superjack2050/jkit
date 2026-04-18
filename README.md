@@ -23,8 +23,15 @@ Pick the path that fits your workflow.
 
 ### Option A — Claude Code plugin (recommended)
 
+Run these **as two separate commands** (each on its own turn in Claude Code —
+don't paste both at once, the first command would consume the second as its
+argument):
+
 ```
 /plugin marketplace add superjack2050/JKit
+```
+
+```
 /plugin install jkit@jkit
 ```
 
