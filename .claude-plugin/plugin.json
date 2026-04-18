@@ -1,6 +1,6 @@
 {
   "name": "jkit",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Cognitive-transparency planning for Claude Code. Turns fuzzy ideas into explicit plan files (spec + design + tasks + ambiguity ledger) before coding, surfacing every assumption the model would otherwise make silently.",
   "author": {
     "name": "jack.xie",
