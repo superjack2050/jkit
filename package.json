@@ -1,0 +1,36 @@
+{
+  "name": "@YOUR_NPM_SCOPE/jkit",
+  "version": "0.0.2",
+  "description": "Cognitive-transparency planning for Claude Code. Installs the JKit skills (before-build, build) into ~/.claude/skills/.",
+  "bin": {
+    "jkit": "./bin/jkit.js"
+  },
+  "scripts": {
+    "postinstall": "node ./bin/jkit.js install --silent-if-not-global || true"
+  },
+  "files": [
+    "skills/",
+    "bin/",
+    ".claude-plugin/",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "claude-code",
+    "plugin",
+    "planning",
+    "skills",
+    "before-build",
+    "ambiguity"
+  ],
+  "author": "jack.xie <nobodyjack2050@gmail.com>",
+  "license": "MIT",
+  "homepage": "https://github.com/YOUR_GITHUB_USERNAME/JKit",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/YOUR_GITHUB_USERNAME/JKit.git"
+  },
+  "engines": {
+    "node": ">=16"
+  }
+}

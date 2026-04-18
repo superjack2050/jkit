@@ -1,0 +1,15 @@
+{
+  "name": "jkit",
+  "owner": {
+    "name": "jack.xie",
+    "email": "nobodyjack2050@gmail.com"
+  },
+  "plugins": [
+    {
+      "name": "jkit",
+      "source": ".",
+      "description": "Cognitive-transparency planning before coding. Before-build surfaces every assumption; build executes atomic tasks from the locked plan.",
+      "version": "0.0.2"
+    }
+  ]
+}
