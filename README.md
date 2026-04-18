@@ -40,6 +40,18 @@ Updates:
 /plugin update jkit
 ```
 
+Or the branded one-liner:
+```
+/jkit:upgrade
+```
+
+**Auto update check:** jkit silently checks GitHub for a newer version on
+every `/jkit:before-build` and `/jkit:build` invocation. If one's
+available, you get a three-option prompt — *update now / skip for this
+run / don't ask again*. The "don't ask again" choice writes
+`~/.claude/jkit-skip-update-check` to disable future checks permanently;
+delete that file to re-enable.
+
 ### Option B — git clone + symlink (no package manager needed)
 
 ```bash

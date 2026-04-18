@@ -28,6 +28,45 @@ PART 2 (Design), and PART 4 (Ambiguity Ledger) as context.
 
 ---
 
+## PHASE 0 — UPDATE CHECK (silent, before PHASE 1)
+
+Check for a newer jkit version on GitHub. Any failure in this step is
+non-critical — silently skip and proceed to PHASE 1.
+
+**Skip entirely if** `~/.claude/jkit-skip-update-check` exists (user opted
+out). Check with Bash `test -f ~/.claude/jkit-skip-update-check`.
+
+Otherwise:
+
+1. **Read installed version**:
+   ```
+   find ~/.claude/plugins -type f -name plugin.json -path '*jkit*' 2>/dev/null | head -1
+   ```
+   Read, extract `version`.
+
+2. **Fetch remote version** — WebFetch
+   `https://raw.githubusercontent.com/superjack2050/jkit/main/.claude-plugin/plugin.json`
+   and extract `version`.
+
+3. **Compare (semver)**. If remote > local, present a blocking
+   `AskUserQuestion`:
+
+   > *"jkit v{remote} is available (you're on v{local}). What would you
+   > like to do?"*
+
+   Three options:
+   - **Update now** → Stop this skill. Tell the user to run `/jkit:upgrade`
+     (or `/plugin update jkit`), then re-invoke their build request. Quote
+     their original prompt.
+   - **Skip for this run** → Proceed to PHASE 1 on current version.
+   - **Don't ask again** → `touch ~/.claude/jkit-skip-update-check`, then
+     proceed to PHASE 1.
+
+4. **On any error** (file missing, network fail, parse fail): silently
+   skip — never surface check errors to the user.
+
+---
+
 ## PHASE 1 — LOCATE PLAN
 
 1. Run `ls plan-*.md` in the project root to list candidate plans.

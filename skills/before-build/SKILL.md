@@ -158,6 +158,45 @@ Run `ls plan-*.md` in project root. Branch on findings:
 against existing slugs. High confidence = keyword overlap ≥70% OR explicit
 reference by user ("update the invoice plan"). Everything else → ask.
 
+### Q3.5: Update check (silent, before Q4)
+
+Check for a newer jkit version on GitHub. Any failure in this step is
+non-critical — silently skip and move to Q4.
+
+**Skip entirely if** `~/.claude/jkit-skip-update-check` exists (user opted
+out). Check with Bash `test -f ~/.claude/jkit-skip-update-check`.
+
+Otherwise:
+
+1. **Read installed version** — find the installed plugin's manifest:
+   ```
+   find ~/.claude/plugins -type f -name plugin.json -path '*jkit*' 2>/dev/null | head -1
+   ```
+   Read the file, extract `version`.
+
+2. **Fetch remote version** — WebFetch
+   `https://raw.githubusercontent.com/superjack2050/jkit/main/.claude-plugin/plugin.json`
+   and extract `version`.
+
+3. **Compare (semver)**. If remote > local, present the user with a blocking
+   `AskUserQuestion`:
+
+   > *"jkit v{remote} is available (you're on v{local}). What would you
+   > like to do?"*
+
+   With exactly these three options:
+   - **Update now** → Stop this skill immediately. Tell the user to run
+     `/jkit:upgrade` (or `/plugin update jkit`), then re-invoke their
+     original request. Quote their original prompt back so they can
+     copy-paste.
+   - **Skip for this run** → Proceed to Q4 with the current version.
+   - **Don't ask again** → Create the opt-out flag with
+     `touch ~/.claude/jkit-skip-update-check`, then proceed to Q4.
+
+4. **On any error** (file missing, network failure, JSON parse fail,
+   ambiguous version): silently skip — do NOT surface errors to the user.
+   The update check must never block the skill on its own flakiness.
+
 ### Q4: Announce intent
 
 Before PHASE 1 begins, share — in your own words — four things:
