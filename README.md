@@ -24,7 +24,7 @@ Pick the path that fits your workflow.
 ### Option A — Claude Code plugin (recommended)
 
 ```
-/plugin marketplace add YOUR_GITHUB_USERNAME/JKit
+/plugin marketplace add superjack2050/JKit
 /plugin install jkit@jkit
 ```
 
@@ -36,7 +36,7 @@ Updates:
 ### Option B — git clone + symlink (no package manager needed)
 
 ```bash
-git clone https://github.com/YOUR_GITHUB_USERNAME/JKit ~/code/JKit
+git clone https://github.com/superjack2050/JKit ~/code/JKit
 mkdir -p ~/.claude/skills
 ln -sfn ~/code/JKit/skills/before-build ~/.claude/skills/before-build
 ln -sfn ~/code/JKit/skills/build ~/.claude/skills/build
