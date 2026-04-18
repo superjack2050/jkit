@@ -231,66 +231,107 @@ When a requirement depends on external systems (web pages to scrape, third-party
 specific DOM structures, undocumented services), some information **cannot be gathered
 through conversation alone**. It requires technical evidence.
 
-Follow this priority chain:
+> **Iron rule:** Gather evidence for *blocking* dependencies during clarification, not
+> during execution. If the user could share a screenshot, saved HTML, or curl response
+> in 60 seconds, asking now saves hours of rework later.
 
-### When to Scan
+### Two Levels of Scanning
 
-External dependency resolution operates at two levels:
-
-**Level 1: Continuous (throughout Dim 1-8)**
+**Level 1: Continuous (throughout Dim 1-8) — soft, tool-driven**
 Whenever any dimension surfaces an external reference, immediately use available tools
-to gather evidence. This includes both technical and business/context information:
+to gather context. Examples:
 
 - Dim 1: user mentions a deadline or event → search for context if unclear
 - Dim 2: user says "like BrainGrid" → search what BrainGrid does, features, pricing
 - Dim 2: user says "currently using easybill" → search easybill's capabilities and limits
 - Dim 3: user says "must comply with EU VAT invoice rules" → search the legal requirements
-- Dim 4: user says "in Amazon seller central" → search seller central page structure
 - Dim 6: user says "use Cloudflare D1" → search D1 limitations, SQLite compatibility
 - Dim 7: user mentions a third-party dependency → search for known issues, rate limits
 
-**Level 2: Systematic check (after Dim 8)**
-After Dim 8 (Appetite), the final scope is locked — appetite may have cut some FRs.
-Do a final sweep on the surviving FRs + Actors + ACs and ask:
-"Does this depend on something outside the codebase whose structure, format, or behavior
-I still don't have evidence for?"
+**Level 2: Blocking gate (after Dim 3, before Dim 4) — hard, must resolve**
+After Dim 3 produces the FR list, enumerate each dependency that would block
+implementation without evidence. These MUST reach Priority 1 or Priority 2 — you cannot
+enter Dim 4 with unresolved blocking dependencies unless Priority 3 conditions hold.
 
-Why after Appetite, not earlier: appetite may cut FRs. No point investigating
-dependencies for features that got descoped. Check only what will actually be built.
+**Level 3: Final re-check (after Dim 8)**
+Appetite may cut FRs. Re-scan surviving FRs to confirm no blocking dependency slipped
+through, then proceed to spec generation.
 
-**Both levels are implicit.** Do not announce "scanning dependencies" to the user.
-Use tools silently, then weave findings into the conversation naturally:
-"I found that Amazon has an official SP-API for invoice upload. For the tech approach,
-would you prefer DOM scraping or the API route?"
+**All levels are implicit to the user.** Do not announce "scanning dependencies." Use
+tools silently, then weave findings into the conversation naturally. When you need the
+user's help for evidence, ask directly and conversationally.
+
+### Blocking vs Non-Blocking
+
+**Blocking** — without evidence, you would write "figure out selectors during coding"
+or "match whatever the API returns" in the implementation spec. Examples:
+- DOM selectors for scraping a page your code must read
+- Shape of an API response your code must parse
+- Required fields in a regulated form (tax invoice, KYC)
+- Data format of a file the code must produce or consume
+
+**Non-blocking** — evidence would be nice but absence doesn't stop you from writing
+a reasonable implementation spec. Examples:
+- Exact copy text ("we'll match the site's tone")
+- Minor cosmetic details
+- Optional field formats
 
 ### Priority 1: Tools First
 
-Discover what tools are available in this session and use the best fit to gather evidence.
-Do not assume a fixed tool list — the user may have MCP servers, plugins, or skills
-that provide specialized access.
+Discover what tools are available in this session (WebFetch, WebSearch, Read, MCP servers,
+Glob, Grep, custom skills) and use the best fit. Do not assume a fixed tool list.
 
-**After finding evidence → present to user for confirmation.**
-Search results may be outdated or inaccurate. Briefly share what you found and ask
-if it matches their experience. User confirmation turns evidence into fact.
+**After finding evidence → present to user for confirmation.** Search results may be
+outdated. Briefly share what you found and ask if it matches their experience. User
+confirmation turns evidence into fact.
 
-### Priority 2: Ask User with Guidance
+### Priority 2: Ask User with Guidance (the default for DOM / API / private data)
 
-When tools can't access the information, ask the user to provide concrete evidence.
+When tools can't access the information, ask the user to provide concrete evidence
+*now, during clarification*. This is almost always the right move for:
+- Behind-login web pages (seller dashboards, admin UIs)
+- Private APIs the user has access to
+- Internal documents, schemas, config files
+- Anything your tools can't reach
 
 **Principles:**
-- Be specific about WHAT you need — "I need to see the order row's HTML structure"
-  not "tell me about the page"
-- Suggest the simplest method first — "save the page as HTML" before "open DevTools"
-- Adapt to the user's skill level — if they seem non-technical, suggest screenshots
-  or copy-pasting visible text rather than console commands
+- Be specific about WHAT you need — "I need the HTML of a single order row and the full
+  order detail page" beats "tell me about the page"
+- Suggest the simplest method first
+- Adapt to the user's skill level
 - If the user provides a file path, use Read to analyze it yourself
+- Ask for a representative sample, not exhaustive coverage (1-2 examples usually enough)
 
-### Priority 3: Mark and Classify
+**Evidence-gathering playbook — suggest the simplest option that fits:**
 
-When evidence is still unavailable, mark **specific details** (not entire FRs):
-- `[ASSUMED]` — reasonable guess, safe to code against, minor rework risk
-- `[NEEDS_INVESTIGATION]` blocking — no evidence, core to the FR → generates Task 0
-- `[NEEDS_INVESTIGATION]` non-blocking — affects detail not architecture → verify step in task
+| Need | Simplest ask | More technical ask |
+|------|-------------|-------------------|
+| DOM structure of a page | "In the browser, Cmd+S / Ctrl+S → 'Webpage, Complete' → share the file path" | "In DevTools, right-click the element → Copy → Copy outerHTML, paste here" |
+| Visual layout | "Take a screenshot of the section and drop it in chat" | — |
+| API response shape | "Open DevTools Network tab, trigger the action, copy the response JSON" | "Run `curl -v <url>` with your auth header, paste the output" |
+| A few real data rows | "Copy-paste the visible text or export to CSV and share a sample" | "Run a SELECT on the table and paste 3-5 rows" |
+| A config file's shape | "Share the file contents (redact secrets)" | "Point me at the file path, I'll read it" |
+| A page flow | "Walk me through screenshot-by-screenshot" | "Record a short video / GIF" |
+
+When the user provides a file, use Read immediately to analyze and confirm what you found.
+Don't keep asking follow-ups if one good file already answers the question.
+
+### Priority 3: Mark and Classify (LAST RESORT for blocking items)
+
+Only use `[NEEDS_INVESTIGATION] blocking` when **both** are true:
+  (a) tools cannot retrieve the evidence, AND
+  (b) the user explicitly cannot or will not provide it at planning time
+      (e.g. "I don't have access until Monday", "the system is offline", or they decline
+      when asked directly).
+
+When this happens, the spec must record *why* evidence couldn't be gathered during
+clarification — this justifies the exceptional Task 0 and lets a future reader verify
+it was a real constraint, not a skipped step.
+
+Tags — mark **specific details**, not entire FRs:
+- `[ASSUMED]` — reasonable guess, safe to code against, minor rework risk (non-blocking)
+- `[NEEDS_INVESTIGATION] blocking` — rare; Priority 3 conditions met → generates Task 0
+- `[NEEDS_INVESTIGATION] non-blocking` — affects detail not architecture → verify step in task
 
 ---
 
@@ -304,3 +345,10 @@ When evidence is still unavailable, mark **specific details** (not entire FRs):
 - Skipping "Why Now" and "For Whom" — they feel soft but they're load-bearing
 - Jumping to technical dimensions before understanding the problem
 - Stopping too early because "the basics are covered" — all dimensions matter
+- **Marking DOM/API structure as `[NEEDS_INVESTIGATION] blocking` and deferring to Task 0
+  when the user could share a saved HTML file or DevTools copy in 60 seconds.** Asking
+  during clarification is cheap; rewriting selectors mid-execution is expensive.
+- Generating a Task 0 that says "open the page, inspect elements, record selectors" —
+  that's planning work that belongs in clarification, not execution. If you're writing
+  this Task 0, stop and go ask the user for the page instead.
+- Using `[ASSUMED]` for something the user would happily confirm with one sentence
