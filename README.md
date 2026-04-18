@@ -33,25 +33,7 @@ Updates:
 /plugin update jkit
 ```
 
-### Option B — npm
-
-```bash
-# zero-install (runs once, symlinks skills)
-npx @YOUR_NPM_SCOPE/jkit
-
-# or global install
-npm install -g @YOUR_NPM_SCOPE/jkit
-jkit install
-```
-
-Updates:
-```bash
-npx @YOUR_NPM_SCOPE/jkit@latest
-# or
-npm update -g @YOUR_NPM_SCOPE/jkit && jkit install
-```
-
-### Option C — git clone + symlink (no package manager needed)
+### Option B — git clone + symlink (no package manager needed)
 
 ```bash
 git clone https://github.com/YOUR_GITHUB_USERNAME/JKit ~/code/JKit
@@ -60,10 +42,25 @@ ln -sfn ~/code/JKit/skills/before-build ~/.claude/skills/before-build
 ln -sfn ~/code/JKit/skills/build ~/.claude/skills/build
 ```
 
+Or run the bundled installer (same effect, with status/uninstall commands):
+```bash
+node ~/code/JKit/bin/jkit.js install
+node ~/code/JKit/bin/jkit.js status
+```
+
 Updates:
 ```bash
 cd ~/code/JKit && git pull
 # symlinks follow automatically
+```
+
+### Option C — npm (coming soon)
+
+An `npx @scope/jkit` installer is wired up in the repo but not yet
+published to npm. Once published, the commands will be:
+```bash
+npx @scope/jkit                    # install
+npx @scope/jkit@latest             # upgrade
 ```
 
 ## Usage
@@ -101,7 +98,7 @@ through a blast-radius classifier to keep changes contained.
 | Method | Command |
 |--------|---------|
 | Plugin | `/plugin uninstall jkit` |
-| npm | `jkit uninstall` (or `npm uninstall -g @YOUR_NPM_SCOPE/jkit`) |
+| npm / bundled installer | `node bin/jkit.js uninstall` (or `jkit uninstall` if installed globally) |
 | Manual | `rm ~/.claude/skills/before-build ~/.claude/skills/build` |
 
 ## License
