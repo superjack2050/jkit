@@ -1,7 +1,7 @@
 {
   "name": "@YOUR_NPM_SCOPE/jkit",
   "version": "0.0.2",
-  "description": "Cognitive-transparency planning for Claude Code. Installs the JKit skills (before-build, build) into ~/.claude/skills/.",
+  "description": "Cognitive-transparency planning for Claude Code. Installs the jkit skills (before-build, build) into ~/.claude/skills/.",
   "bin": {
     "jkit": "./bin/jkit.js"
   },

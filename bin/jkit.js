@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// JKit installer: symlinks (or copies) the JKit skills into ~/.claude/skills/.
+// jkit installer: symlinks (or copies) the jkit skills into ~/.claude/skills/.
 //
 // Usage:
 //   jkit install       — symlink skills into ~/.claude/skills/ (default)
@@ -135,10 +135,10 @@ function doStatus() {
 }
 
 function usage() {
-  console.log(`jkit — JKit skills installer
+  console.log(`jkit — jkit skills installer
 
 Usage:
-  jkit install       Symlink JKit skills into ~/.claude/skills/
+  jkit install       Symlink jkit skills into ~/.claude/skills/
   jkit uninstall     Remove the symlinks
   jkit status        Check current install state
   jkit --help        Show this message

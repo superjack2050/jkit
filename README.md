@@ -1,10 +1,10 @@
-# JKit
+# jkit
 
 **Karpathy called it: the #1 AI coding failure mode is the model
 silently picking the wrong path at an ambiguous decision point.** You
 lose hours to rework when you find out.
 
-JKit puts an ambiguity gate into every feature. Writing a new module?
+jkit puts an ambiguity gate into every feature. Writing a new module?
 Library choice with no codebase precedent? External API whose shape
 you haven't verified? The skill stops, surfaces the fork, and either
 asks you, checks with a tool, or tags it. **No more *"I assumed you
@@ -68,7 +68,7 @@ You say:
 > "I want a weekly report for admins that summarizes sales per category.
 > Not sure what time window yet."
 
-JKit batches the unclear pieces (time window, which categories, what
+jkit batches the unclear pieces (time window, which categories, what
 "summarize" means) into one question. You answer, and out comes
 `plan-weekly-report.md` containing:
 
@@ -105,7 +105,7 @@ first consume the second as its argument):
 
 **Update:** `/jkit:upgrade`
 
-JKit quietly checks for newer versions at the start of each run. If one
+jkit quietly checks for newer versions at the start of each run. If one
 exists you get three options: *update now / skip for this run / don't
 ask again*. The last writes `~/.claude/jkit-skip-update-check` — delete
 that file to re-enable.
@@ -132,7 +132,7 @@ published yet.
 /jkit:before-build
 ```
 
-JKit walks with you through:
+jkit walks with you through:
 
 1. **Clarify** — batched questions fill in just what's missing
 2. **Evidence** — external unknowns (DOM shapes, APIs, regulations) get resolved via tools → you → tagged as a last resort
@@ -176,7 +176,7 @@ not that."
 
 ## Multi-feature projects
 
-One `plan-<slug>.md` per feature. When you come back with a change, JKit
+One `plan-<slug>.md` per feature. When you come back with a change, jkit
 figures out how much to redo — from "fix a typo in place" to "this
 looks like a new feature, let's start a new plan" — and never rolls
 your change in silently.

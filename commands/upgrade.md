@@ -1,8 +1,8 @@
 ---
-description: Update JKit to the latest version from its GitHub marketplace.
+description: Update jkit to the latest version from its GitHub marketplace.
 ---
 
-Update JKit by running these native Claude Code commands in sequence and
+Update jkit by running these native Claude Code commands in sequence and
 report what changed:
 
 1. `/plugin marketplace update superjack2050/jkit`
