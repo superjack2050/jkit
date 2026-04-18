@@ -28,7 +28,7 @@ don't paste both at once, the first command would consume the second as its
 argument):
 
 ```
-/plugin marketplace add superjack2050/JKit
+/plugin marketplace add superjack2050/jkit
 ```
 
 ```
@@ -43,21 +43,21 @@ Updates:
 ### Option B — git clone + symlink (no package manager needed)
 
 ```bash
-git clone https://github.com/superjack2050/JKit ~/code/JKit
+git clone https://github.com/superjack2050/jkit ~/code/jkit
 mkdir -p ~/.claude/skills
-ln -sfn ~/code/JKit/skills/before-build ~/.claude/skills/before-build
-ln -sfn ~/code/JKit/skills/build ~/.claude/skills/build
+ln -sfn ~/code/jkit/skills/before-build ~/.claude/skills/before-build
+ln -sfn ~/code/jkit/skills/build ~/.claude/skills/build
 ```
 
 Or run the bundled installer (same effect, with status/uninstall commands):
 ```bash
-node ~/code/JKit/bin/jkit.js install
-node ~/code/JKit/bin/jkit.js status
+node ~/code/jkit/bin/jkit.js install
+node ~/code/jkit/bin/jkit.js status
 ```
 
 Updates:
 ```bash
-cd ~/code/JKit && git pull
+cd ~/code/jkit && git pull
 # symlinks follow automatically
 ```
 

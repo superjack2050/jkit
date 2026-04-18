@@ -9,7 +9,7 @@
       "name": "jkit",
       "source": "./",
       "description": "Cognitive-transparency planning before coding. Before-build surfaces every assumption; build executes atomic tasks from the locked plan.",
-      "version": "0.0.3"
+      "version": "0.0.4"
     }
   ]
 }
