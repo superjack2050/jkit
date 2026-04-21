@@ -1,5 +1,7 @@
 # jkit
 
+*Built on [four principles](./principles.md).*
+
 **Karpathy called it: the #1 AI coding failure mode is the model
 silently picking the wrong path at an ambiguous decision point.** You
 lose hours to rework when you find out.
