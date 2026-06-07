@@ -26,9 +26,12 @@ should not silently guess.
 - jkit supports Codex plugin consumption through `.codex-plugin/plugin.json`,
   while preserving Claude Code plugin metadata and wrappers.
 - jkit uses `@nobodyjack/jkit` as the npm package name.
-- `@nobodyjack/jkit@0.9.0` and `@nobodyjack/jkit@0.9.1` are published on npm.
-- npm publishing uses `npm publish --access public`; do not use an OTP publish
-  path unless npm explicitly requires it for the active account.
+- `@nobodyjack/jkit@0.9.0`, `@nobodyjack/jkit@0.9.1`, and
+  `@nobodyjack/jkit@0.9.2` are published on npm.
+- The local root-entry package state starts at `@nobodyjack/jkit@0.9.3`.
+- npm publishing uses `npm publish --access public`; if npm explicitly
+  requires OTP or browser/passkey confirmation for the active account, complete
+  that interactive npm auth step outside non-interactive agent execution.
 - npm install has no runtime integration side effect; runtime setup is explicit.
 - Codex local plugin registration is handled by `jkit codex install`.
 

@@ -98,7 +98,7 @@ npm install -g @nobodyjack/jkit
 jkit codex install
 jkit codex status
 
-安装完成后，请验证 jkit plugin 是否可用。
+安装完成后，请重启或刷新 Codex，开启新会话，并验证 jkit skills 是否可用。
 ```
 
 - Manual Codex install remains available as terminal commands:
@@ -112,12 +112,17 @@ jkit codex status
 - `jkit codex install` verifies `.codex-plugin/plugin.json`, creates or updates
   `~/plugins/jkit` as a symlink to the current package root, and adds or updates
   a `jkit` entry in `~/.agents/plugins/marketplace.json`.
+- `jkit codex install` then runs `codex plugin add jkit@personal` so Codex
+  installs and enables the plugin instead of only discovering it in the local
+  marketplace.
 - The Codex marketplace entry uses local plugin source path `./plugins/jkit`.
 - Existing non-jkit marketplace entries are preserved.
 - Existing non-symlink `~/plugins/jkit` paths are not overwritten.
-- `jkit codex uninstall` removes the `jkit` marketplace entry and removes
-  `~/plugins/jkit` only when it is a symlink to the current package root.
-- `jkit codex status` reports the manifest, symlink, and marketplace entry.
+- `jkit codex uninstall` runs `codex plugin remove jkit@personal`, removes the
+  `jkit` marketplace entry, and removes `~/plugins/jkit` only when it is a
+  symlink to the current package root.
+- `jkit codex status` reports the manifest, symlink, marketplace entry, and
+  official Codex installed/enabled state from `codex plugin list`.
 
 ### README
 

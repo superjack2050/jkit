@@ -8,12 +8,15 @@
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
+const childProcess = require('child_process');
 
 const PKG_ROOT = path.resolve(__dirname, '..');
 const SKILLS_SRC = path.join(PKG_ROOT, 'skills');
 const SKILLS_DST = path.join(os.homedir(), '.claude', 'skills');
-const SKILL_NAMES = ['map-init', 'explore', 'grill-me', 'clarify', 'to-spec', 'to-plan', 'to-done', 'run'];
+const SKILL_NAMES = ['jkit', 'map-init', 'explore', 'grill-me', 'clarify', 'to-spec', 'to-plan', 'to-done', 'run'];
 const CODEX_PLUGIN_NAME = 'jkit';
+const CODEX_MARKETPLACE_NAME = 'personal';
+const CODEX_PLUGIN_SELECTOR = `${CODEX_PLUGIN_NAME}@${CODEX_MARKETPLACE_NAME}`;
 const CODEX_MANIFEST = path.join(PKG_ROOT, '.codex-plugin', 'plugin.json');
 const CODEX_PLUGIN_LINK = path.join(os.homedir(), 'plugins', CODEX_PLUGIN_NAME);
 const CODEX_MARKETPLACE = path.join(os.homedir(), '.agents', 'plugins', 'marketplace.json');
@@ -45,6 +48,25 @@ function readJson(filePath) {
 function writeJson(filePath, value) {
   fs.mkdirSync(path.dirname(filePath), { recursive: true });
   fs.writeFileSync(filePath, `${JSON.stringify(value, null, 2)}\n`);
+}
+
+function runCodex(args) {
+  const result = childProcess.spawnSync('codex', args, {
+    encoding: 'utf8',
+  });
+
+  if (result.error && result.error.code === 'ENOENT') {
+    throw new Error('missing Codex CLI; install or open Codex, then ensure `codex` is available on PATH');
+  }
+  if (result.error) {
+    throw result.error;
+  }
+  if (result.status !== 0) {
+    const output = [result.stderr, result.stdout].filter(Boolean).join('\n').trim();
+    throw new Error(output || `codex ${args.join(' ')} failed`);
+  }
+
+  return result.stdout || '';
 }
 
 function resolveSymlink(linkPath) {
@@ -265,10 +287,12 @@ function doCodexInstall() {
   validateCodexManifest();
   ensureCodexLink();
   installCodexMarketplaceEntry();
-  log('Restart or refresh Codex for the plugin registration to load.');
+  installCodexPlugin();
+  log('Restart or refresh Codex, then open a new session for the jkit skills to load.');
 }
 
 function doCodexUninstall() {
+  removeCodexPlugin();
   removeCodexMarketplaceEntry();
 
   const stat = statIfExists(CODEX_PLUGIN_LINK);
@@ -289,6 +313,20 @@ function doCodexUninstall() {
 
   fs.unlinkSync(CODEX_PLUGIN_LINK);
   log(`✓ removed Codex plugin link: ${CODEX_PLUGIN_LINK}`);
+}
+
+function installCodexPlugin() {
+  runCodex(['plugin', 'add', CODEX_PLUGIN_SELECTOR]);
+  log(`✓ installed and enabled Codex plugin: ${CODEX_PLUGIN_SELECTOR}`);
+}
+
+function removeCodexPlugin() {
+  try {
+    runCodex(['plugin', 'remove', CODEX_PLUGIN_SELECTOR]);
+    log(`✓ removed Codex plugin install: ${CODEX_PLUGIN_SELECTOR}`);
+  } catch (error) {
+    log(`⚠ Codex plugin remove skipped: ${error.message}`);
+  }
 }
 
 function statusCodexManifest() {
@@ -344,11 +382,37 @@ function statusCodexMarketplace() {
   }
 }
 
+function statusCodexInstall() {
+  try {
+    const raw = runCodex(['plugin', 'list', '--marketplace', CODEX_MARKETPLACE_NAME, '--json', '--available']);
+    const listing = JSON.parse(raw);
+    const installed = Array.isArray(listing.installed) ? listing.installed : [];
+    const available = Array.isArray(listing.available) ? listing.available : [];
+    const installedEntry = installed.find((plugin) => plugin && plugin.pluginId === CODEX_PLUGIN_SELECTOR);
+    const availableEntry = available.find((plugin) => plugin && plugin.pluginId === CODEX_PLUGIN_SELECTOR);
+
+    if (installedEntry) {
+      const state = installedEntry.enabled ? 'enabled' : 'disabled';
+      log(`✓ Codex install: installed, ${state} (${CODEX_PLUGIN_SELECTOR}@${installedEntry.version || 'unknown'})`);
+      return;
+    }
+    if (availableEntry) {
+      log(`· Codex install: available but not installed (${CODEX_PLUGIN_SELECTOR})`);
+      return;
+    }
+
+    log(`· Codex install: not visible in marketplace ${CODEX_MARKETPLACE_NAME}`);
+  } catch (error) {
+    log(`⚠ Codex install: ${error.message}`);
+  }
+}
+
 function doCodexStatus() {
   log('Codex plugin');
   statusCodexManifest();
   statusCodexLink();
   statusCodexMarketplace();
+  statusCodexInstall();
 }
 
 function doStatus() {
@@ -361,9 +425,9 @@ function usage() {
   console.log(`jkit — agent-map toolkit installer
 
 Usage:
-  jkit codex install          Register jkit as a local Codex plugin
-  jkit codex uninstall        Remove the local Codex plugin registration
-  jkit codex status           Check Codex plugin registration
+  jkit codex install          Register, install, and enable jkit as a local Codex plugin
+  jkit codex uninstall        Remove the local Codex plugin install and registration
+  jkit codex status           Check Codex plugin registration and installed/enabled state
 
   jkit claude-code install    Symlink jkit skills into ~/.claude/skills/
   jkit claude-code uninstall  Remove local Claude Code skill symlinks

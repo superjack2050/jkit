@@ -11,6 +11,7 @@ commands:
   generate_context: "./scripts/agent-map-generate"
   check_maps: "./scripts/agent-map-check"
   verify: "node bin/jkit.js status && ./scripts/codex-plugin-check && npm pack --dry-run"
+  jkit: "/jkit"
   run: "/run"
   explore: "/explore"
   grill_me: "/grill-me"

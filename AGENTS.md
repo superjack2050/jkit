@@ -13,6 +13,7 @@ the full manual. Load deeper context from `docs/` only when the task needs it.
 
 ## Project Shape
 
+- `skills/jkit`: root help and routing skill for the jkit workflow.
 - `skills/map-init`: skill for initializing repository agent maps.
 - `skills/explore`: skill for discussing rough requirements, comparing
   solution directions, and producing ready `/to-spec` input.
@@ -28,6 +29,7 @@ the full manual. Load deeper context from `docs/` only when the task needs it.
   through minimal spec, minimal plan, `/run`, and verified completion.
 - `skills/run`: skill for driving one active plan's Goal-Driven Execution loop
   to verified completion.
+- `commands/jkit.md`: plugin command wrapper for the jkit root entry.
 - `commands/map-init.md`: plugin command wrapper for `/jkit:map-init`.
 - `commands/explore.md`: plugin command wrapper for `/jkit:explore`.
 - `commands/grill-me.md`: plugin command wrapper for `/jkit:grill-me`.

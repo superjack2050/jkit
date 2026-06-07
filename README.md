@@ -55,7 +55,7 @@ npm install -g @nobodyjack/jkit
 jkit codex install
 jkit codex status
 
-安装完成后，请验证 jkit plugin 是否可用。
+安装完成后，请重启或刷新 Codex，开启新会话，并验证 jkit skills 是否可用。
 ```
 
 ##### Manual install
@@ -119,6 +119,7 @@ verification loop、decisions、progress log 和 rollback notes。
 
 | Command | 说明 |
 |---|---|
+| `/jkit` 或 `$jkit` | 显示 jkit 工作流帮助，列出可用命令，并根据当前状态路由到下一步 |
 | `/map-init` | 初始化仓库级 agent map，补齐 agent 可读的项目入口、工作流、记录和验证规则 |
 | `/explore` | 探讨粗需求、比较方案方向，并生成可交给 `/to-spec` 的输入；启发自 [`obra/superpowers`](https://github.com/obra/superpowers) 的 `brainstorming` |
 | `/grill-me` | 逐问追问已选需求和方案方向，澄清关键决策，并生成可交给 `/to-spec` 的输入；启发自 [`mattpocock/skills`](https://github.com/mattpocock/skills) 的 `/grill-me` |
@@ -161,7 +162,7 @@ agent map 是 coding agent 的仓库级操作上下文。它把一个仓库变�
 - 验证层：`scripts/agent-map-check`、`scripts/agent-map-generate` 和项目检查命令
   提供可运行的检查和生成命令，让 agent map 可以被验证和刷新。
 - 命令层：`skills/`、`commands/`
-  把 `/explore`、`/grill-me`、`/clarify`、`/to-spec`、`/to-plan`、`/to-done`、`/run` 等流程变成可组合命令。
+  把 `jkit` 帮助入口和 `/explore`、`/grill-me`、`/clarify`、`/to-spec`、`/to-plan`、`/to-done`、`/run` 等流程变成可组合命令。
 
 目标是让仓库本身成为 coding agent 工作的记录系统：需求、决策、计划、进度、
 验证和恢复都保存在版本化的项目文件中。

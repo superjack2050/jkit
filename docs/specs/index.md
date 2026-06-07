@@ -10,6 +10,7 @@ Specs define command behavior and user-visible workflow contracts.
   ready input for `/to-spec`.
 - `grill-me.md`: pressure-test selected requirements and solution directions
   before `/to-spec`.
+- `jkit.md`: provide the root help and routing entry for the jkit workflow.
 - `map-init.md`: initialize repository agent maps.
 - `map-init-dry-run.md`: preview `/map-init` scaffold changes without writing
   files.

@@ -2,21 +2,22 @@
 
 Status: Draft
 
-jkit is a small Claude Code plugin and local installer centered on agent-map
-skills: `/map-init` and `/run`.
+jkit is a small Claude Code and Codex plugin package centered on agent-map
+skills and thin command wrappers.
 
 ## Current Shape
 
 ```text
 bin/jkit.js
-  -> skills/map-init
-  -> skills/run
-commands/map-init.md
-  -> skills/map-init/SKILL.md
-commands/run.md
-  -> skills/run/SKILL.md
+  -> runtime install/status helpers
+skills/
+  -> reusable workflow instructions
+commands/
+  -> thin plugin command wrappers
 .claude-plugin
-  -> Claude plugin metadata
+  -> Claude Code plugin metadata
+.codex-plugin
+  -> Codex plugin metadata
 docs
   -> repository agent map and long-running state
 scripts
@@ -25,17 +26,19 @@ scripts
 
 ## Responsibilities
 
-`bin/jkit.js` installs jkit skills by symlinking them into
-`~/.claude/skills`.
+`bin/jkit.js` installs or reports local runtime state. Claude Code fallback
+installation symlinks skills into `~/.claude/skills`; Codex installation
+registers a local marketplace entry, links the package under `~/plugins/jkit`,
+and runs the Codex plugin add flow.
 
-`skills/map-init` contains the workflow, artifact guide, and templates for
-initializing repository agent maps.
+`skills/jkit` is the root help and routing entry.
 
-`skills/run` contains the workflow for executing one active ExecPlan milestone,
-verifying it, and updating maps.
+`skills/map-init`, `skills/explore`, `skills/grill-me`, `skills/clarify`,
+`skills/to-spec`, `skills/to-plan`, `skills/to-done`, and `skills/run`
+contain the reusable workflow instructions.
 
-`commands/map-init.md` and `commands/run.md` give plugin users explicit command
-entry points.
+`commands/*.md` give plugin users thin command entry points while keeping
+workflow logic in the matching skill.
 
 `docs` is the durable knowledge base for specs, plans, records, playbooks, and
 generated context.

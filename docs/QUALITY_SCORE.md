@@ -9,8 +9,9 @@ Overall: 8 / 10
 ## Strengths
 
 - Repository has a short `AGENTS.md` entry map.
-- `/map-init`, `/explore`, `/grill-me`, `/clarify`, `/to-spec`, `/to-plan`,
-  `/to-done`, and `/run` are shipped v2 skills.
+- `jkit` is shipped as a root help/routing skill, and `/map-init`,
+  `/explore`, `/grill-me`, `/clarify`, `/to-spec`, `/to-plan`, `/to-done`,
+  and `/run` are shipped v2 skills.
 - `/explore` has a command skill, wrapper, map-aware lightweight exploration
   rules, and `/to-spec` handoff requirements.
 - `/grill-me` has a command skill, wrapper, targeted project-base evidence
@@ -39,6 +40,20 @@ Overall: 8 / 10
 - No fixture-based eval harness exists yet.
 
 ## Last Verification
+
+On 2026-06-07, root entry and Codex activation fix checks passed:
+
+- `node -c bin/jkit.js`
+- `node bin/jkit.js --help`
+- `node bin/jkit.js status`
+- `./scripts/agent-map-check`
+- `./scripts/codex-plugin-check`
+- `npm pack --dry-run --json`
+- package dry run confirmed `commands/jkit.md` and `skills/jkit/SKILL.md` are
+  included in the local `@nobodyjack/jkit@0.9.3` package
+- `@nobodyjack/jkit@0.9.2` exists on npm, but its tarball does not include this
+  root-entry package state; the interruption and version mismatch are recorded
+  under `docs/records/verification-failures/`
 
 On 2026-06-07, release cleanup and npm publication checks passed:
 

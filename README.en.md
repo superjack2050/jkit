@@ -56,7 +56,8 @@ npm install -g @nobodyjack/jkit
 jkit codex install
 jkit codex status
 
-After installation, verify that the jkit plugin is available.
+After installation, restart or refresh Codex, open a new session, and verify
+that the jkit skills are available.
 ```
 
 ##### Manual install
@@ -126,6 +127,7 @@ execution loop.
 
 | Command | Description |
 |---|---|
+| `/jkit` or `$jkit` | Show jkit workflow help, list available commands, and route to the next step |
 | `/map-init` | Initialize the repository-level agent map with agent-readable project entry points, workflows, records, and verification rules |
 | `/explore` | Discuss a rough requirement, compare solution directions, and produce ready input for `/to-spec`; inspired by [`obra/superpowers`](https://github.com/obra/superpowers) `brainstorming` |
 | `/grill-me` | Question a selected requirement and solution direction one step at a time, clarify key decisions, and produce ready input for `/to-spec`; inspired by [`mattpocock/skills`](https://github.com/mattpocock/skills) `/grill-me` |
@@ -177,7 +179,7 @@ In jkit, an agent map is made of coordinated layers:
   `scripts/agent-map-generate`, project checks
   Runnable checks and generators that keep the map fresh and verifiable.
 - Command layer: `skills/`, `commands/`
-  Composable workflows such as `/explore`, `/grill-me`, `/clarify`,
+  The `jkit` help entry plus composable workflows such as `/explore`, `/grill-me`, `/clarify`,
   `/to-spec`, `/to-plan`, `/to-done`, and `/run`.
 
 The goal is to make the repository itself the system of record for
