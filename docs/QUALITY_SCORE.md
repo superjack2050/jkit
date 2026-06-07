@@ -47,6 +47,7 @@ On 2026-06-07, release cleanup and npm publication checks passed:
 - `./scripts/agent-map-check`
 - `./scripts/codex-plugin-check`
 - `npm pack --dry-run`
+- `npm publish --access public`
 - package leak scan confirmed `docs/exec-plans/`, `docs/records/`,
   `docs/specs/`, `/map-repair`, and `.swp` files were excluded from the npm
   tarball

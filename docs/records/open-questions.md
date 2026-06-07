@@ -27,6 +27,8 @@ should not silently guess.
   while preserving Claude Code plugin metadata and wrappers.
 - jkit uses `@nobodyjack/jkit` as the npm package name.
 - `@nobodyjack/jkit@0.9.0` and `@nobodyjack/jkit@0.9.1` are published on npm.
+- npm publishing uses `npm publish --access public`; do not use an OTP publish
+  path unless npm explicitly requires it for the active account.
 - npm install has no runtime integration side effect; runtime setup is explicit.
 - Codex local plugin registration is handled by `jkit codex install`.
 
