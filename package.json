@@ -1,6 +1,6 @@
 {
   "name": "@nobodyjack/jkit",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "description": "Agent-map toolkit for Codex and Claude Code. Initializes repository harnesses, explores, pressure-tests and clarifies requirements, writes specs, creates plans, fast-paths clear work, and drives active plans through verified goal loops.",
   "bin": {
     "jkit": "bin/jkit.js"

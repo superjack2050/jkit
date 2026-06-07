@@ -26,7 +26,7 @@ should not silently guess.
 - jkit supports Codex plugin consumption through `.codex-plugin/plugin.json`,
   while preserving Claude Code plugin metadata and wrappers.
 - jkit uses `@nobodyjack/jkit` as the npm package name.
-- `@nobodyjack/jkit@0.9.0` is published on npm.
+- `@nobodyjack/jkit@0.9.0` and `@nobodyjack/jkit@0.9.1` are published on npm.
 - npm install has no runtime integration side effect; runtime setup is explicit.
 - Codex local plugin registration is handled by `jkit codex install`.
 

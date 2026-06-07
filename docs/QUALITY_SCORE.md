@@ -50,7 +50,7 @@ On 2026-06-07, release cleanup and npm publication checks passed:
 - package leak scan confirmed `docs/exec-plans/`, `docs/records/`,
   `docs/specs/`, `/map-repair`, and `.swp` files were excluded from the npm
   tarball
-- `npm view @nobodyjack/jkit version` returned `0.9.0` after publication
+- `npm view @nobodyjack/jkit version` returned `0.9.1` after publication
 
 On 2026-06-06, these checks passed:
 

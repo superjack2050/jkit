@@ -9,7 +9,7 @@
       "name": "jkit",
       "source": "./",
       "description": "Agent-map toolkit for Claude Code and Codex. Map-init creates repository harnesses; explore shapes rough requirements; grill-me pressure-tests selected directions; clarify resolves spec blockers; to-spec writes specs; to-plan creates plans; to-done fast-paths clear work; run drives plans through verified goal loops.",
-      "version": "0.9.0"
+      "version": "0.9.1"
     }
   ]
 }
