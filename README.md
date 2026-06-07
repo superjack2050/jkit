@@ -17,25 +17,27 @@ jkit 是一个 agent-map 驱动的开发工具包，基于仓库级 agent map �
 复制到 Claude Code：
 
 ```text
-帮我安装 superjack2050/jkit 的 jkit 插件。
+帮我安装 jkit Claude Code plugin。
+
+请执行或引导我执行：
+
+/plugin marketplace add superjack2050/jkit
+/plugin install jkit@jkit
+/reload-plugins
+
+安装完成后，请验证 jkit commands 是否可用。
 ```
 
 如果 Claude Code 要求确认插件来源，选择 `superjack2050/jkit` 和 `jkit@jkit`。
 
 ##### Manual install
 
-在 Claude Code 中逐条发送：
+在终端执行：
 
-```text
-/plugin marketplace add superjack2050/jkit
-```
-
-```text
-/plugin install jkit@jkit
-```
-
-```text
-/reload-plugins
+```bash
+npm install -g @nobodyjack/jkit
+jkit claude-code install
+jkit claude-code status
 ```
 
 #### Codex

@@ -52,28 +52,30 @@ The public README should default to Chinese and link to an English version.
 ### Claude Code
 
 - The recommended README path presents Claude Code installation first as a
-  semantic prompt copied into Claude Code, then as manual plugin commands:
+  semantic prompt copied into Claude Code, then as manual terminal commands:
 
 ```text
-帮我安装 superjack2050/jkit 的 jkit 插件。
-```
+帮我安装 jkit Claude Code plugin。
 
-Manual Claude Code install remains available as plugin commands sent one at a
-time in Claude Code:
+请执行或引导我执行：
 
-```text
 /plugin marketplace add superjack2050/jkit
-```
-
-```text
 /plugin install jkit@jkit
-```
-
-```text
 /reload-plugins
+
+安装完成后，请验证 jkit commands 是否可用。
 ```
 
-- The npm CLI keeps a local symlink fallback for development and controlled
+- Manual Claude Code install is a terminal fallback through npm and the local
+  skill symlink installer:
+
+```bash
+npm install -g @nobodyjack/jkit
+jkit claude-code install
+jkit claude-code status
+```
+
+- The npm CLI keeps this local symlink fallback for development and controlled
   manual installs.
 - `jkit claude-code install` symlinks each shipped skill into
   `~/.claude/skills`.

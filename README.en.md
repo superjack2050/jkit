@@ -17,7 +17,15 @@ Inspired by OpenAI's [Harness Engineering](https://openai.com/zh-Hans-CN/index/h
 Copy this into Claude Code:
 
 ```text
-Install the jkit plugin from superjack2050/jkit.
+Install the jkit Claude Code plugin.
+
+Please run or guide me through:
+
+/plugin marketplace add superjack2050/jkit
+/plugin install jkit@jkit
+/reload-plugins
+
+After installation, verify that the jkit commands are available.
 ```
 
 If Claude Code asks you to confirm the plugin source, choose
@@ -25,18 +33,12 @@ If Claude Code asks you to confirm the plugin source, choose
 
 ##### Manual install
 
-Send these in Claude Code one at a time:
+Run these in your terminal:
 
-```text
-/plugin marketplace add superjack2050/jkit
-```
-
-```text
-/plugin install jkit@jkit
-```
-
-```text
-/reload-plugins
+```bash
+npm install -g @nobodyjack/jkit
+jkit claude-code install
+jkit claude-code status
 ```
 
 #### Codex
