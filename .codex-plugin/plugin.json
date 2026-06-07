@@ -1,0 +1,56 @@
+{
+  "name": "jkit",
+  "version": "0.9.0",
+  "description": "Agent-map toolkit for Codex and Claude Code. Initializes repository harnesses, explores, pressure-tests and clarifies requirements, writes specs, creates plans, fast-paths clear work, and drives active plans through verified goal loops.",
+  "author": {
+    "name": "jack.xie",
+    "email": "nobodyjack2050@gmail.com",
+    "url": "https://github.com/superjack2050"
+  },
+  "homepage": "https://github.com/superjack2050/jkit",
+  "repository": "https://github.com/superjack2050/jkit",
+  "license": "MIT",
+  "keywords": [
+    "codex",
+    "claude-code",
+    "plugin",
+    "planning",
+    "skills",
+    "map-init",
+    "explore",
+    "grill-me",
+    "clarify",
+    "to-spec",
+    "to-plan",
+    "to-done",
+    "run",
+    "goal-driven",
+    "agent-map",
+    "harness",
+    "agents",
+    "docs"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "jkit",
+    "shortDescription": "Agent-map workflows for exploration, specs, plans, and verified runs",
+    "longDescription": "jkit helps Codex and Claude Code work from durable repository maps: initialize an agent-readable harness, explore rough requirements, pressure-test selected directions, clarify blocking spec ambiguity, turn intent into specs, create executable plans, fast-path clear work, and run active plans through review and verification.",
+    "developerName": "jack.xie",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Read",
+      "Write"
+    ],
+    "websiteURL": "https://github.com/superjack2050/jkit",
+    "defaultPrompt": [
+      "Initialize an agent map for this repo",
+      "Explore this rough requirement",
+      "Pressure-test this requirement",
+      "Clarify this spec before planning",
+      "Turn this requirement into a spec",
+      "Run the active plan to verified completion"
+    ],
+    "brandColor": "#0F766E",
+    "screenshots": []
+  }
+}

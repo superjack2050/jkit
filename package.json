@@ -1,27 +1,54 @@
 {
-  "name": "@YOUR_NPM_SCOPE/jkit",
-  "version": "0.0.2",
-  "description": "Cognitive-transparency planning for Claude Code. Installs the jkit skills (before-build, build) into ~/.claude/skills/.",
+  "name": "@nobodyjack/jkit",
+  "version": "0.9.0",
+  "description": "Agent-map toolkit for Codex and Claude Code. Initializes repository harnesses, explores, pressure-tests and clarifies requirements, writes specs, creates plans, fast-paths clear work, and drives active plans through verified goal loops.",
   "bin": {
-    "jkit": "./bin/jkit.js"
-  },
-  "scripts": {
-    "postinstall": "node ./bin/jkit.js install --silent-if-not-global || true"
+    "jkit": "bin/jkit.js"
   },
   "files": [
     "skills/",
+    "commands/",
     "bin/",
+    "scripts/",
+    "docs/README.md",
+    "docs/WORKFLOW.md",
+    "docs/PLANS.md",
+    "docs/AGENT_WORKING_PRINCIPLES.md",
+    "docs/ENGINEERING.md",
+    "docs/RELIABILITY.md",
+    "docs/SECURITY.md",
+    "docs/playbooks/README.md",
+    "docs/references/README.md",
+    "docs/generated/README.md",
     ".claude-plugin/",
+    ".codex-plugin/",
+    "AGENTS.md",
+    "ARCHITECTURE.md",
+    "agent-map.yaml",
     "README.md",
+    "README.en.md",
     "LICENSE"
   ],
   "keywords": [
     "claude-code",
+    "codex",
+    "codex-plugin",
     "plugin",
     "planning",
     "skills",
-    "before-build",
-    "ambiguity"
+    "map-init",
+    "explore",
+    "grill-me",
+    "clarify",
+    "to-spec",
+    "to-plan",
+    "to-done",
+    "run",
+    "goal-driven",
+    "agent-map",
+    "harness",
+    "agents",
+    "docs"
   ],
   "author": "jack.xie <nobodyjack2050@gmail.com>",
   "license": "MIT",

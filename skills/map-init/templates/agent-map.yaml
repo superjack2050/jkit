@@ -1,0 +1,27 @@
+version: 1
+project:
+  name: ""
+  mode: ""
+  scaffold_level: "standard"
+  stack: []
+commands:
+  generate_context: "./scripts/agent-map-generate"
+  check_maps: "./scripts/agent-map-check"
+  verify: ""
+docs:
+  root: "docs"
+  specs: "docs/specs"
+  plans: "docs/exec-plans"
+  records: "docs/records"
+update_rules:
+  api_changed: []
+  schema_changed: []
+  package_layout_changed:
+    - "run ./scripts/agent-map-generate"
+  test_layout_changed:
+    - "run ./scripts/agent-map-generate"
+  user_behavior_changed:
+    - "update docs/specs"
+    - "update docs/exec-plans when work is complex"
+sensitive_paths: []
+open_questions: []

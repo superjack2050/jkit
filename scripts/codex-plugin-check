@@ -1,0 +1,26 @@
+#!/usr/bin/env sh
+set -eu
+
+VALIDATOR="${CODEX_PLUGIN_VALIDATOR:-$HOME/.codex/skills/.system/plugin-creator/scripts/validate_plugin.py}"
+PYTHON_BIN="${PYTHON:-python3}"
+VENV_DIR="${TMPDIR:-/tmp}/jkit-codex-validate-venv"
+
+if [ ! -f "$VALIDATOR" ]; then
+  echo "missing Codex plugin validator: $VALIDATOR" >&2
+  exit 1
+fi
+
+if "$PYTHON_BIN" - <<'PY' >/dev/null 2>&1
+import yaml
+PY
+then
+  exec "$PYTHON_BIN" "$VALIDATOR" .
+fi
+
+if [ ! -x "$VENV_DIR/bin/python" ]; then
+  rm -rf "$VENV_DIR"
+  "$PYTHON_BIN" -m venv "$VENV_DIR"
+  PIP_DISABLE_PIP_VERSION_CHECK=1 "$VENV_DIR/bin/python" -m pip install PyYAML >/dev/null
+fi
+
+exec "$VENV_DIR/bin/python" "$VALIDATOR" .

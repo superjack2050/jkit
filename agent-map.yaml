@@ -1,0 +1,48 @@
+version: 1
+project:
+  name: "jkit"
+  mode: "brownfield"
+  scaffold_level: "standard"
+  stack:
+    - "node"
+    - "claude-code-plugin"
+    - "codex-plugin"
+commands:
+  generate_context: "./scripts/agent-map-generate"
+  check_maps: "./scripts/agent-map-check"
+  verify: "node bin/jkit.js status && ./scripts/codex-plugin-check && npm pack --dry-run"
+  run: "/run"
+  explore: "/explore"
+  grill_me: "/grill-me"
+  clarify: "/clarify"
+  to_spec: "/to-spec"
+  to_plan: "/to-plan"
+  to_done: "/to-done"
+docs:
+  root: "docs"
+  specs: "docs/specs"
+  plans: "docs/exec-plans"
+  records: "docs/records"
+update_rules:
+  package_changed:
+    - "node bin/jkit.js status"
+    - "./scripts/codex-plugin-check"
+    - "npm pack --dry-run"
+  skill_changed:
+    - "node bin/jkit.js status"
+    - "npm pack --dry-run"
+  command_changed:
+    - "npm pack --dry-run"
+  package_layout_changed:
+    - "./scripts/agent-map-generate"
+  workflow_changed:
+    - "update docs/WORKFLOW.md"
+    - "update docs/exec-plans/active when work is complex"
+  run_completed:
+    - "update active ExecPlan progress log"
+    - "record review result"
+    - "record verification results"
+    - "run ./scripts/agent-map-generate when source layout changed"
+sensitive_paths:
+  - ".claude-plugin/"
+  - ".codex-plugin/"

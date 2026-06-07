@@ -1,220 +1,169 @@
 # jkit
 
-*Built on [four principles](./principles.md).*
+> 语言：中文 | [English](README.en.md)
 
-**Karpathy called it: the #1 AI coding failure mode is the model
-silently picking the wrong path at an ambiguous decision point.** You
-lose hours to rework when you find out.
+jkit 是一个 agent-map 驱动的开发工具包，基于仓库级 agent map 和可组合命令，为 coding agent 构建可复用、可验证、可恢复的 harness。
 
-jkit puts an ambiguity gate into every feature. Writing a new module?
-Library choice with no codebase precedent? External API whose shape
-you haven't verified? The skill stops, surfaces the fork, and either
-asks you, checks with a tool, or tags it. **No more *"I assumed you
-wanted…"***
+构建思路受到 OpenAI 的 [Harness Engineering](https://openai.com/zh-Hans-CN/index/harness-engineering/) 启发：把仓库作为 coding agent 可读取、可执行、可验证的记录系统，而不是依赖一次性聊天上下文。
 
-Not a blunt "confirm everything" script. Every unknown takes one of
-three shapes — nothing else is allowed:
+## Get Started
 
-- **Consensus** — you explicitly agreed
-- **`[ASSUMED]`** — flagged and visible; safe with minor rework risk
-- **`[NEEDS_INVESTIGATION]`** — blocked until evidence arrives
+### 安装
 
-The cost: ~10 minutes of aligning before any code gets written.
-The payoff: the rework you'd have found hours later never shows up.
+#### Claude Code
 
-> "The models make wrong assumptions on your behalf and just run along
-> with them without checking. They don't manage their confusion, don't
-> seek clarifications, don't surface inconsistencies, don't present
-> tradeoffs, don't push back when they should."
-> — **Andrej Karpathy** ([January 2026](https://x.com/karpathy/status/2015883857489522876))
+##### Install with Claude Code
 
-## Not another spec tool
+复制到 Claude Code：
 
-Plenty of tools produce spec documents. The value here isn't writing a
-spec — it's that every step fights the same quiet enemy:
-
-> "LLM code will usually look fantastic: good variable names, convincing
-> comments, clear type annotations and a logical structure. This can lull
-> you into a false sense of security."
-> — **Simon Willison** ([March 2025](https://simonwillison.net/2025/Mar/2/hallucinations-in-code/))
-
-That's why:
-
-- Clarification actively suggests options instead of waiting for you to think them up
-- Sections like "Assumptions" and "Silent Defaults" can't be empty — they say *"none identified"* if nothing applies. A missing section means the check got skipped.
-- Checkpoints are real pauses, not click-throughs
-- The skill asks tools first, you second, flags last
-
-The deal: ~10 minutes of aligning up front. The payoff: the rework you'd
-have found hours later never shows up.
-
----
-
-## What's inside
-
-| Skill | Command | What it does |
-|-------|---------|--------------|
-| before-build | `/jkit:before-build` | Clarify → spec → design → tasks → ambiguity ledger, into `plan-<slug>.md` |
-| build | `/jkit:build <slug>` | Execute the locked plan's tasks with verification |
-| upgrade | `/jkit:upgrade` | Pull the latest from GitHub |
-
-> Installed via symlink? The commands drop the `jkit:` prefix —
-> `/before-build`, `/build`. `/jkit:upgrade` is plugin-only.
-
----
-
-## A quick walk-through
-
-You say:
-
-> "I want a weekly report for admins that summarizes sales per category.
-> Not sure what time window yet."
-
-jkit batches the unclear pieces (time window, which categories, what
-"summarize" means) into one question. You answer, and out comes
-`plan-weekly-report.md` containing:
-
-- **Spec** — what you're building, data model, acceptance criteria
-- **Design** — chose `node-cron` + a PostgreSQL view, with 2 alternatives considered
-- **Ambiguity Ledger** —
-  - `[ASSUMED]` email delivery via your existing Resend account
-  - `[DEFAULT]` reports stored in S3 with 30-day TTL *(alternatives: local FS / no-persist)*
-  - `[NEEDS_INVESTIGATION]` exact "admin" role name in your auth schema — resolved during Task 2
-
-At the checkpoint you say "actually, keep reports forever, we need an
-audit trail." The plan updates, tasks generate, and
-`/jkit:build weekly-report` runs them.
-
-If something breaks later, you can open the ledger and know exactly
-which assumption to revisit.
-
----
-
-## Install
-
-### Option A — Claude Code plugin (recommended)
-
-Two commands, **each on its own turn** (pasting both at once makes the
-first consume the second as its argument):
-
+```text
+帮我安装 superjack2050/jkit 的 jkit 插件。
 ```
+
+如果 Claude Code 要求确认插件来源，选择 `superjack2050/jkit` 和 `jkit@jkit`。
+
+##### Manual install
+
+在 Claude Code 中逐条发送：
+
+```text
 /plugin marketplace add superjack2050/jkit
 ```
 
-```
+```text
 /plugin install jkit@jkit
 ```
 
-**Update:** `/jkit:upgrade`
+```text
+/reload-plugins
+```
 
-jkit quietly checks for newer versions at the start of each run. If one
-exists you get three options: *update now / skip for this run / don't
-ask again*. The last writes `~/.claude/jkit-skip-update-check` — delete
-that file to re-enable.
+#### Codex
 
-### Option B — git clone + symlink
+##### Install with Codex
+
+复制到 Codex：
+
+```text
+帮我安装 jkit Codex plugin。
+
+请在终端执行：
+
+npm install -g @nobodyjack/jkit
+jkit codex install
+jkit codex status
+
+安装完成后，请验证 jkit plugin 是否可用。
+```
+
+##### Manual install
+
+在终端执行：
 
 ```bash
-git clone https://github.com/superjack2050/jkit ~/code/jkit
-node ~/code/jkit/bin/jkit.js install
+npm install -g @nobodyjack/jkit
+jkit codex install
+jkit codex status
 ```
 
-**Update:** `cd ~/code/jkit && git pull` (symlinks follow automatically)
+### 初始化 agent map
 
-### Option C — npm (coming soon)
+在仓库中运行 `/map-init`，初始化或更新仓库级 agent map。
 
-`npx @scope/jkit` — the installer's wired up in the repo, just not
-published yet.
+agent map 会为 coding agent 提供项目入口、工作流规则、记录、计划、
+generated indexes 和验证命令，让 agent 能基于仓库状态工作，而不是只依赖聊天历史。
 
----
+## Workflow
 
-## Using it
+当前已发布的工作流是：
 
-```
-/jkit:before-build
-```
-
-jkit walks with you through:
-
-1. **Clarify** — batched questions fill in just what's missing
-2. **Evidence** — external unknowns (DOM shapes, APIs, regulations) get resolved via tools → you → tagged as a last resort
-3. **Draft** — spec and design
-4. **Checkpoint** — you read the ambiguity ledger and push back on anything
-5. **Tasks** — generated only once you lock the plan
-
-Then:
-
-```
-/jkit:build <feature-slug>
+```text
+/map-init -> /explore -> /grill-me -> /to-spec -> /clarify -> /to-plan -> /run
+                                               \-> /to-done ->/
 ```
 
-Each task runs, verifies, and if it hits a decision the plan didn't
-cover, it pauses and surfaces it rather than guessing.
+### 需求探索与方案成形
 
----
+当需求还比较粗时使用 `/explore`。它用于探讨需求、比较方案方向、识别风险，
+并生成推荐方向和可交给 `/to-spec` 的输入。
 
-## What the plan looks like
+当方向已经选定但关键决策还没问透时使用 `/grill-me`。它逐问追问范围、
+边界、验收和验证信号，并生成可交给 `/to-spec` 的输入。
 
-One `plan-<slug>.md` per feature:
+### Spec 编写与澄清
 
-```
-# Plan: [Feature Name]
-> Status: draft | locked | in-progress | complete
+使用 `/to-spec` 把明确输入、当前会话上下文或 repo/project base 转成
+`docs/specs/` 下的一份可 review spec。
 
-PART 1 — SPEC              (WHAT)           §1–10
-PART 2 — DESIGN            (HOW: strategy)  §11–14
-PART 3 — TASKS             (HOW: execution)
-PART 4 — AMBIGUITY LEDGER
-  §A Assumptions       — every [ASSUMED]
-  §U Unknowns          — every [NEEDS_INVESTIGATION]
-  §D Silent Defaults   — every HOW decision not dictated by the spec
-```
+当已有 spec 存在会阻塞 `/to-plan` 的需求或验收问题时使用 `/clarify`。
+它优先用项目证据解决问题，并把澄清结果写回 spec。
 
-**PART 4 is the one you read at the checkpoint.** It's where every
-unspoken thing got named — and it's the cheapest moment to say "wait,
-not that."
+### 计划拆解
 
----
+使用 `/to-plan` 把一份可规划的 spec 转成 active ExecPlan，包含 checklist、
+verification loop、decisions、progress log 和 rollback notes。
 
-## Multi-feature projects
+### 执行与验证
 
-One `plan-<slug>.md` per feature. When you come back with a change, jkit
-figures out how much to redo — from "fix a typo in place" to "this
-looks like a new feature, let's start a new plan" — and never rolls
-your change in silently.
+使用 `/run` 执行 active plan 中已准备好的工作，review diff，修复范围内问题，
+运行验证，更新记录，并持续推进直到目标完成或记录明确 blocker。
 
----
+### 清晰小任务的快速路径
 
-## Uninstall
+只有当需求已经清晰且范围有限时使用 `/to-done`。它会创建必要的最小 durable artifacts，
+再进入同一套可验证执行闭环。
 
-```
-/plugin uninstall jkit          # plugin
-node bin/jkit.js uninstall      # symlink / bundled installer
-rm ~/.claude/skills/before-build ~/.claude/skills/build    # manual
-```
+## Commands
 
-Re-enable update checks (if you'd opted out):
+| Command | 说明 |
+|---|---|
+| `/map-init` | 初始化仓库级 agent map，补齐 agent 可读的项目入口、工作流、记录和验证规则 |
+| `/explore` | 探讨粗需求、比较方案方向，并生成可交给 `/to-spec` 的输入；启发自 [`obra/superpowers`](https://github.com/obra/superpowers) 的 `brainstorming` |
+| `/grill-me` | 逐问追问已选需求和方案方向，澄清关键决策，并生成可交给 `/to-spec` 的输入；启发自 [`mattpocock/skills`](https://github.com/mattpocock/skills) 的 `/grill-me` |
+| `/clarify` | 澄清一个已有 spec 中阻塞 `/to-plan` 的需求或验收问题，并把结果写回 spec；启发自 [`github/spec-kit`](https://github.com/github/spec-kit) 的 `/speckit.clarify` |
+| `/to-spec` | 从明确输入、当前会话上下文或 repo/project base 创建或更新可 review 的 spec |
+| `/to-plan` | 把可 review 的 spec 转成带 Checklist 和 Verification Loop 的 active ExecPlan |
+| `/to-done` | 对清晰、有限的需求走快速闭环：最小 spec、最小 plan、`/run`、真实验证完成 |
+| `/run` | 执行 active ExecPlan 的 Goal-Driven Execution loop，review、修复、验证并更新 maps |
 
-```bash
-rm ~/.claude/jkit-skip-update-check
-```
+## Agent Maps
 
----
+agent map 是 coding agent 的仓库级操作上下文。它把一个仓库变成 agent
+可以导航、验证和恢复工作的 workspace。
 
-## Contributing
+一份好的 agent map 应该回答六个问题：
 
-```bash
-git clone https://github.com/superjack2050/jkit ~/code/jkit
-cd ~/code/jkit
-node bin/jkit.js install
-# Edit skills/*/SKILL.md, open a new Claude Code session — changes are live.
-```
+- agent 应该从哪里开始？
+- agent 应该遵循什么工作流？
+- 需求、spec、plan 和记录放在哪里？
+- 有哪些可用命令和检查？
+- 哪些事实已知、哪些只是 assumed、哪些仍然 unresolved？
+- 后续 agent 应该如何继续或修复工作？
 
-Pull requests welcome. Everything outside `.claude-plugin/*.json` is
-prose that shapes the skill — changes there need no build step.
+在 jkit 中，agent map 由多层协同组成：
 
----
+- 入口层：`AGENTS.md`、`agent-map.yaml`
+  给 agent 一个短入口、项目形状、路由规则和机器可读配置。
+- Workflow 层：`docs/WORKFLOW.md`、`docs/PLANS.md`
+  定义从需求到 spec、plan、run、records 的默认工作流，以及 ExecPlan 的形状和使用规则。
+- 工作原则层：`docs/AGENT_WORKING_PRINCIPLES.md`
+  记录 agent 在仓库中协作时应遵循的行为原则、边界和偏好。
+- 技术架构层：`ARCHITECTURE.md`、`docs/ENGINEERING.md`、`docs/RELIABILITY.md`、`docs/SECURITY.md`
+  让 agent 理解系统架构、工程规则、可靠性要求和安全边界。
+- 需求与计划层：`docs/specs/`、`docs/exec-plans/`
+  存放可 review 的行为 spec、active plans、completed plans 和技术债记录。
+- 持久记录层：`docs/records/`
+  记录 open questions、workflow exceptions、verification failures 和其他不能丢失的上下文。
+- 导航索引层：`docs/generated/`
+  通过生成索引帮助 agent 快速理解仓库结构，避免把大段上下文塞进单个文件。
+- 验证层：`scripts/agent-map-check`、`scripts/agent-map-generate` 和项目检查命令
+  提供可运行的检查和生成命令，让 agent map 可以被验证和刷新。
+- 命令层：`skills/`、`commands/`
+  把 `/explore`、`/grill-me`、`/clarify`、`/to-spec`、`/to-plan`、`/to-done`、`/run` 等流程变成可组合命令。
+
+目标是让仓库本身成为 coding agent 工作的记录系统：需求、决策、计划、进度、
+验证和恢复都保存在版本化的项目文件中。
 
 ## License
 
-MIT — see [LICENSE](./LICENSE).
+MIT，见 `LICENSE`。

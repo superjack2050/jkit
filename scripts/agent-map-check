@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+cd "$(dirname "$0")/.."
+
+test -f AGENTS.md
+test -f agent-map.yaml
+test -f ARCHITECTURE.md
+test -f docs/README.md
+test -f docs/WORKFLOW.md
+test -f docs/PLANS.md
+test -f docs/records/open-questions.md
+test -f skills/map-init/SKILL.md
+test -f skills/explore/SKILL.md
+test -f skills/grill-me/SKILL.md
+test -f skills/clarify/SKILL.md
+test -f skills/run/SKILL.md
+test -f skills/to-spec/SKILL.md
+test -f skills/to-plan/SKILL.md
+test -f skills/to-done/SKILL.md
+test -f commands/map-init.md
+test -f commands/explore.md
+test -f commands/grill-me.md
+test -f commands/clarify.md
+test -f commands/run.md
+test -f commands/to-spec.md
+test -f commands/to-plan.md
+test -f commands/to-done.md
+
+if [ -d skills/before-build ] || [ -d skills/build ]; then
+  echo "legacy before-build/build skills should not exist after the map-init reset" >&2
+  exit 1
+fi
+
+echo "agent map scaffold is present"
