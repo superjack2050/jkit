@@ -24,8 +24,9 @@ Overall: 8 / 10
   missing-brief behavior.
 - `/to-plan` has a command skill, wrapper, active-plan reuse rules, and
   blocking-question behavior.
-- `/to-done` has a command skill, wrapper, eligibility gate, fallback rules,
-  and durable-artifact requirements.
+- `/to-done` has a command skill, wrapper, readiness gate, adaptive routing
+  rules, minimal-versus-full artifact sizing, and durable-artifact
+  requirements.
 - Codex plugin support is represented by `.codex-plugin/plugin.json` and shares
   the existing `skills/` bundle.
 - Runtime install support is explicit: Claude Code uses plugin marketplace, and
@@ -40,6 +41,18 @@ Overall: 8 / 10
 - No fixture-based eval harness exists yet.
 
 ## Last Verification
+
+On 2026-06-08, `/to-done` adaptive orchestration implementation checks passed:
+
+- `test -f commands/to-done.md`
+- `test -f skills/to-done/SKILL.md`
+- static coverage scan for adaptive orchestration, readiness gate, clear
+  complex routing, `/grill-me`, `/clarify`, and stage transitions
+- `node -c bin/jkit.js`
+- `node bin/jkit.js status`
+- `./scripts/codex-plugin-check`
+- `./scripts/agent-map-check`
+- `npm pack --dry-run --json`
 
 On 2026-06-07, root entry and Codex activation fix checks passed:
 

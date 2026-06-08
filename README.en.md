@@ -117,11 +117,13 @@ Use `/run` to execute an active plan's ready work, review the diff, fix
 in-scope issues, run verification, update records, and move the plan forward
 until the goal is complete or a blocker is recorded.
 
-### Fast path for clear work
+### Adaptive path to done
 
-Use `/to-done` only when the requirement is already clear and bounded. It
-creates the minimal durable artifacts needed, then drives the same verified
-execution loop.
+Use `/to-done` to move from the current intent to verified done. It first
+detects which context is missing, then dynamically enters `/explore`,
+`/grill-me`, `/to-spec`, `/clarify`, `/to-plan`, or `/run` as needed. Clear
+small work uses minimal durable artifacts; complex work uses a full spec, full
+plan, and broader verification.
 
 ## Commands
 
@@ -134,7 +136,7 @@ execution loop.
 | `/clarify` | Resolve planning-blocking ambiguity in one existing spec and write the clarifications back before `/to-plan`; inspired by [`github/spec-kit`](https://github.com/github/spec-kit) `/speckit.clarify` |
 | `/to-spec` | Create or update one reviewable spec from explicit input, current session context, or the repo/project base |
 | `/to-plan` | Convert a reviewable spec into an active ExecPlan with a Checklist and Verification Loop |
-| `/to-done` | Fast-path clear, bounded work through minimal spec, minimal plan, `/run`, and verified completion |
+| `/to-done` | Adaptive orchestration from intent to verified done; dynamically routes through `/explore`, `/grill-me`, `/clarify`, `/to-spec`, `/to-plan`, or `/run` as needed |
 | `/run` | Execute an active ExecPlan goal loop to verified completion, review and fix issues, verify, and update maps |
 
 ## Agent Maps

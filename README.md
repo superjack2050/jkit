@@ -110,10 +110,11 @@ verification loop、decisions、progress log 和 rollback notes。
 使用 `/run` 执行 active plan 中已准备好的工作，review diff，修复范围内问题，
 运行验证，更新记录，并持续推进直到目标完成或记录明确 blocker。
 
-### 清晰小任务的快速路径
+### 到完成的自适应编排
 
-只有当需求已经清晰且范围有限时使用 `/to-done`。它会创建必要的最小 durable artifacts，
-再进入同一套可验证执行闭环。
+使用 `/to-done` 从当前意图推进到 verified done。它会先判断当前缺少哪类上下文，
+必要时动态进入 `/explore`、`/grill-me`、`/to-spec`、`/clarify`、`/to-plan` 或 `/run`。
+清晰小任务使用最小 durable artifacts；复杂任务使用完整 spec、完整 plan 和更充分的验证。
 
 ## Commands
 
@@ -126,7 +127,7 @@ verification loop、decisions、progress log 和 rollback notes。
 | `/clarify` | 澄清一个已有 spec 中阻塞 `/to-plan` 的需求或验收问题，并把结果写回 spec；启发自 [`github/spec-kit`](https://github.com/github/spec-kit) 的 `/speckit.clarify` |
 | `/to-spec` | 从明确输入、当前会话上下文或 repo/project base 创建或更新可 review 的 spec |
 | `/to-plan` | 把可 review 的 spec 转成带 Checklist 和 Verification Loop 的 active ExecPlan |
-| `/to-done` | 对清晰、有限的需求走快速闭环：最小 spec、最小 plan、`/run`、真实验证完成 |
+| `/to-done` | 从 intent 到 verified done 的自适应编排；按需动态进入 `/explore`、`/grill-me`、`/clarify`、`/to-spec`、`/to-plan` 或 `/run` |
 | `/run` | 执行 active ExecPlan 的 Goal-Driven Execution loop，review、修复、验证并更新 maps |
 
 ## Agent Maps

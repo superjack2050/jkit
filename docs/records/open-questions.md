@@ -16,7 +16,8 @@ should not silently guess.
 - The `/to-plan` command behavior is specified in `docs/specs/to-plan.md`, and
   the skill and command wrapper are implemented.
 - The `/to-done` command behavior is specified in `docs/specs/to-done.md`, and
-  the skill and command wrapper are implemented.
+  the skill and command wrapper are implemented as adaptive orchestration from
+  intent to verified done.
 - The requirements-discovery slice integrates `/explore`, `/grill-me`, and
   `/clarify`, with command behavior specified under `docs/specs/`.
 - The `/clarify` command behavior is specified in `docs/specs/clarify.md`, and

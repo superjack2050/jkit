@@ -47,23 +47,28 @@ Done when:
    item.
 11. Record workflow exceptions when work happened outside this flow.
 
-## Fast Path
+## Adaptive To Done
 
-Use `/to-done` only when the requirement and solution are already clear from
-the current session, or when the user supplied a one/two sentence brief that
-defines both the change and the completion signal.
+Use `/to-done` when the user wants the current intent carried all the way to
+verified done. `/to-done` is adaptive orchestration from intent to verified
+done: it first decides which workflow stage is currently needed, then enters
+that stage visibly and with a reason.
 
-`/to-done` still writes durable artifacts:
+Possible routes:
 
 ```text
-minimal spec -> minimal active ExecPlan -> /run Goal-Driven Execution loop
+rough need -> /explore
+selected but untested direction -> /grill-me
+behavior not durable -> /to-spec
+ambiguous existing spec -> /clarify
+spec ready for planning -> /to-plan
+active plan ready -> /run
+clear small work -> minimal spec -> minimal active ExecPlan -> /run
+clear complex work -> full spec -> full active ExecPlan -> /run
 ```
 
-If the direction is unclear, use `/explore`. If a selected direction still has
-unresolved decision branches, use `/grill-me`. If behavior is unclear, use
-`/to-spec`. If an existing spec has planning-blocking ambiguity, use
-`/clarify`. If implementation strategy is unresolved, use `/to-plan`. If an
-active plan already exists, use `/run`.
+Complexity is allowed when it is represented in durable artifacts and
+verification. Unresolved ambiguity is not allowed to pass into implementation.
 
 ## Verification Ladder
 

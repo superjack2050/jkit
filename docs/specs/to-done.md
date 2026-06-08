@@ -2,32 +2,43 @@
 
 > Status: draft
 > Product: jkit v2
-> Scope: fast-path orchestration from clear intent to verified done
+> Scope: adaptive orchestration from intent to verified done
 
 ## 1. Summary
 
-`/to-done` is the fast path for clear, bounded work. It takes a request that is
-already understood from the current session or simple enough to explain in one
-or two sentences, materializes the required durable artifacts, and drives the
-work to verified completion.
+`/to-done` is adaptive orchestration from intent to verified done. It can
+handle clear small work directly, and it can also handle complex work by
+dynamically routing through the required jkit stages before execution.
+
+The command is allowed to continue only after the current stage has enough
+context. It must not hide ambiguity inside a "done" shortcut. When the request
+is rough, under-tested, underspecified, or not yet planned, `/to-done` must
+explicitly enter the appropriate workflow mode: `/explore`, `/grill-me`,
+`/to-spec`, `/clarify`, `/to-plan`, or `/run`.
 
 It is an orchestration command in the jkit v2 workflow:
 
 ```text
-/map-init -> /to-spec -> /to-plan -> /run -> /map-repair
-                  \-> /to-done ->/
+/map-init -> /explore -> /grill-me -> /to-spec -> /clarify -> /to-plan -> /run
+                  \---------------------- /to-done ---------------------->/
 ```
 
-`/to-done` does not skip `/to-spec`, `/to-plan`, or `/run`. It automates the
-normal path when the work is eligible:
+`/to-done` does not skip requirements exploration, pressure testing,
+clarification, specs, plans, or `/run`. It chooses the shortest safe path based
+on current readiness:
 
 ```text
-/to-done = minimal /to-spec -> minimal /to-plan -> /run
+clear small work     = minimal /to-spec -> minimal /to-plan -> /run
+clear complex work   = full /to-spec -> full /to-plan -> /run
+rough direction      = /explore -> /grill-me? -> /to-spec -> /to-plan -> /run
+selected but untested = /grill-me -> /to-spec -> /to-plan -> /run
+ambiguous spec       = /clarify -> /to-plan -> /run
+active plan ready    = /run
 ```
 
 The command may use conversation context to start, but it must not rely on chat
 history to finish. Before implementation begins, the request must exist as a
-minimal spec and a minimal active ExecPlan. Done means reviewed, repaired,
+spec and an active ExecPlan sized to the work. Done means reviewed, repaired,
 verified, recorded, and moved to completed when appropriate.
 
 ## 2. Background
@@ -38,26 +49,36 @@ jkit v2 has separate commands for making work durable:
 - `/to-plan` turns a plannable spec into an active ExecPlan.
 - `/run` executes the active plan through a Goal-Driven Execution loop.
 
-That deliberate separation is useful for complex or ambiguous work, but it can
-feel heavy when the user and agent already clarified the need in the current
-session or when the request is plainly small. `/to-done` provides a safe fast
-path for those cases while preserving the same artifacts and verification
-contract.
+That deliberate separation is useful, but users often express the desired
+outcome as "finish this" rather than choosing the exact workflow command.
+`/to-done` provides the adaptive entry point for that intent. It can take the
+shortest safe path when the work is already clear, and it can expand into the
+full workflow when the work is complex or missing context.
+
+The key distinction is:
+
+- complexity is allowed when it is made explicit in specs, plans, and
+  verification
+- unresolved ambiguity is not allowed to pass into implementation
 
 ## 3. Goals
 
-- Accept clear work from current conversation context or a one/two sentence
-  brief.
-- Decide whether the work is eligible for fast-path orchestration.
-- Materialize a minimal spec before planning.
-- Materialize a minimal active ExecPlan before implementation.
+- Accept an intent from current conversation context, a brief, a spec, or a
+  plan.
+- Decide the current readiness stage before choosing the next workflow command.
+- Dynamically route to `/explore`, `/grill-me`, `/to-spec`, `/clarify`,
+  `/to-plan`, or `/run` when needed.
+- Materialize a spec before planning. Use a minimal spec for clear small work
+  and a full spec for complex work.
+- Materialize an active ExecPlan before implementation. Use a minimal plan for
+  clear small work and a full plan for complex work.
 - Delegate execution semantics to `/run` rather than inventing a second
   execution loop.
 - Review, repair, and verify before claiming done.
 - Record progress, verification, failures, and map updates durably.
 - Move completed plans to `docs/exec-plans/completed/` after final
   verification when repository convention allows it.
-- Stop at the correct stage when the request is not eligible.
+- Stop at the correct stage when the request cannot be safely advanced.
 - Leave no important requirement only in chat history.
 
 ## 4. Non-goals
@@ -65,11 +86,14 @@ contract.
 - Do not replace `/to-spec`, `/to-plan`, or `/run`.
 - Do not bypass specs, plans, review, verification, records, or generated index
   updates.
-- Do not handle unclear, broad, risky, or multi-option work.
+- Do not force unclear, risky, or unresolved multi-option work into
+  implementation.
+- Do not treat complex work as ineligible only because it is complex.
 - Do not create product requirements from vague intent.
 - Do not run destructive commands, production writes, migrations, or external
   live checks without explicit approval.
 - Do not silently choose among significant design alternatives.
+- Do not silently switch workflow mode; announce the stage transition and why.
 - Do not mark work done when verification is missing, skipped, failing, or
   blocked.
 - Do not execute an existing active plan differently from `/run`.
@@ -93,35 +117,44 @@ Acceptance criteria:
 - The final response links the spec, plan, verification results, and remaining
   blockers, if any.
 
-### 5.2 Complete a simple brief
+### 5.2 Complete complex work through the full path
 
-As a user with a small clear request, I can run `/to-done <brief>` without first
-manually invoking `/to-spec` and `/to-plan`.
-
-Acceptance criteria:
-
-- The brief is accepted only when it is simple enough to define observable
-  behavior in one or two sentences.
-- The command rejects briefs that lack a completion condition or verification
-  signal.
-- The created spec and plan are intentionally small but still complete enough
-  for `/run`.
-- The command does not ask for details that can safely be assumed and recorded.
-
-### 5.3 Stop when work is not eligible
-
-As a user, I want `/to-done` to fall back to the slower workflow when the work
-needs real clarification or planning.
+As a user with a complex but valid request, I can run `/to-done <intent>` and
+have the agent expand into the full jkit workflow instead of rejecting the work
+only because it is complex.
 
 Acceptance criteria:
 
-- If behavior is unclear, the command stops and suggests `/to-spec`.
+- The command identifies that the work is complex and announces that it will
+  use a full spec and full ExecPlan rather than minimal artifacts.
+- The command does not begin implementation until the complex behavior is
+  represented in a durable spec and active ExecPlan.
+- The command may ask or route through prerequisite stages when complexity
+  exposes unresolved requirements, design alternatives, or verification gaps.
+- The final artifacts preserve enough context for a future agent to continue
+  without chat history.
+
+### 5.3 Dynamically route when context is missing
+
+As a user, I want `/to-done` to choose the next necessary workflow stage when
+the request is not ready for implementation.
+
+Acceptance criteria:
+
+- If the need or solution direction is rough, the command enters `/explore`.
+- If a direction is selected but requirements or solution assumptions have not
+  been pressure-tested, the command enters `/grill-me`.
+- If behavior is clear enough for durable writing but no spec exists, the
+  command enters `/to-spec`.
+- If behavior is unclear, the command enters `/to-spec` or asks the minimum
+  necessary question before doing so.
 - If the spec has blocking open questions, the command stops and suggests
-  `/to-spec --update <spec-slug>`.
+  `/clarify <spec-slug>`.
 - If the implementation strategy has unresolved choices, the command stops and
-  suggests `/to-plan <spec-slug>`.
+  suggests or enters `/to-plan <spec-slug>`.
 - If an active plan already exists for the same work, the command uses or
   suggests `/run <plan-slug>` instead of creating a duplicate plan.
+- Each stage transition is announced with a short reason.
 - If verification fails, the command records the exact failure and does not
   claim done.
 
@@ -132,9 +165,13 @@ spec-plan-run work.
 
 Acceptance criteria:
 
-- The minimal spec is listed in `docs/specs/index.md`.
+- The spec is listed in `docs/specs/index.md`.
+- Minimal specs are used only for clear small work; complex work receives a
+  full spec sized to the behavior.
 - The ExecPlan contains Goal, Context, Non-goals, Design, Checklist,
   Verification, Decisions, Progress Log, and Rollback.
+- Minimal ExecPlans are used only for clear small work; complex work receives a
+  full plan sized to the blast radius and verification needs.
 - The plan progress log records checklist status, verification commands and
   results, failures or exceptions, doc-update decisions, generated-index status,
   and new open questions.
@@ -166,37 +203,49 @@ Supported forms:
 
 ```text
 /to-done
-/to-done <brief>
+/to-done <intent-or-brief>
 /to-done <spec-slug>
 /to-done <plan-slug>
 ```
 
 Default behavior:
 
-- With no argument, use current session context only when the requirement,
-  implementation direction, boundaries, acceptance criteria, and verification
-  are already clear.
-- With a brief, use the brief only when it is small and explicit enough to
-  become a minimal spec without consequential questions.
+- With no argument, use current session context as the input intent and run the
+  readiness gate.
+- With an intent or brief, use the supplied text as the primary intent and run
+  the readiness gate.
 - With a spec slug, validate that the spec is plannable, create or update a
-  minimal active plan, then run it.
+  matching active plan, then run it.
 - With a plan slug, delegate to `/run <plan-slug>`.
 - If multiple specs or plans plausibly match, ask which one to use.
+- If a prerequisite stage is needed, announce the stage transition and follow
+  that stage's contract before continuing.
 
-## 7. Eligibility gate
+## 7. Readiness gate
 
-`/to-done` may proceed only when one of these is true:
+`/to-done` must determine the current readiness stage before writing
+implementation code.
 
-- The current session has already established the requirement, solution
-  direction, boundaries, acceptance criteria, and verification.
-- The user supplied a one/two sentence brief that clearly says what to change
-  and how completion will be judged.
+Stage routing:
 
-The work must also satisfy all of these:
+- No agent map: stop and suggest `/map-init`.
+- Rough need or unselected solution direction: enter `/explore`.
+- Selected direction that has not been pressure-tested: enter `/grill-me`.
+- Clear behavior with no durable spec: enter `/to-spec`.
+- Existing spec with planning-blocking ambiguity: enter `/clarify <spec-slug>`.
+- Plannable spec with no active plan: enter `/to-plan <spec-slug>`.
+- Active plan ready for execution: enter `/run <plan-slug>`.
+- Clear small request with no existing artifacts: create minimal spec, minimal
+  active plan, then enter `/run`.
+- Clear complex request with no existing artifacts: create full spec, full
+  active plan, then enter `/run`.
 
-- scope is small enough for one short ExecPlan
+Before implementation begins, the work must satisfy all of these:
+
+- the requirement, solution direction, boundaries, acceptance criteria, and
+  verification are represented in durable artifacts
+- consequential design alternatives have been resolved or explicitly deferred
 - implementation can follow existing project patterns
-- no major design alternative needs selection
 - no security, secret, permission, or sensitive-path ambiguity exists
 - no data loss, migration, persistence, or destructive operation is required
 - no production write or external live check is required without approval
@@ -204,8 +253,11 @@ The work must also satisfy all of these:
 - no blocking `[NEEDS_INVESTIGATION]` item affects behavior, safety,
   compatibility, distribution, acceptance, or verification
 
-If any condition fails, `/to-done` must stop at the correct slower stage instead
-of forcing a fast path.
+If any condition fails, `/to-done` must route to or stop at the correct
+workflow stage instead of forcing implementation.
+
+Complexity is not a failure. Complexity affects artifact size, plan depth,
+verification breadth, and whether more context-gathering stages are required.
 
 ## 8. Required phases
 
@@ -220,9 +272,9 @@ of forcing a fast path.
 - Preserve unrelated dirty worktree changes.
 - If no agent map exists, stop and suggest `/map-init`.
 
-### 8.2 Restate the work
+### 8.2 Restate the intent
 
-From the current session or brief, restate:
+From the current session, intent, brief, spec, or plan, restate:
 
 - goal
 - current behavior
@@ -233,27 +285,61 @@ From the current session or brief, restate:
 - verification checks
 - affected files, docs, skills, commands, package metadata, or runtime surfaces
 
-If the agent cannot restate these confidently, ask one concise question or stop
-and suggest `/to-spec`.
+Also classify:
 
-### 8.3 Apply the eligibility gate
+- rough need
+- selected but untested direction
+- spec-ready behavior
+- ambiguous existing spec
+- plan-ready spec
+- active-plan-ready work
+- clear small request
+- clear complex request
+
+If the agent cannot restate the intent confidently, ask one concise question or
+enter `/explore`.
+
+### 8.3 Apply the readiness gate
 
 - Check the criteria in section 7.
 - Record low-risk assumptions as `[ASSUMED]`.
 - Record unresolved important facts as `[NEEDS_INVESTIGATION]`.
 - Stop before writing implementation code when any blocking question remains.
-- Prefer the slower explicit workflow when in doubt.
+- Prefer the explicit prerequisite workflow stage when in doubt.
 
-### 8.4 Materialize or reuse the spec
+### 8.4 Enter the required prerequisite stage
+
+When the readiness gate identifies a missing stage, enter that stage's behavior
+instead of continuing inside `/to-done` as a black box:
+
+- `/explore`: explore the need and solution directions, then return with ready
+  input for `/grill-me` or `/to-spec`.
+- `/grill-me`: pressure-test the selected requirement and solution direction,
+  then return with ready input for `/to-spec`.
+- `/to-spec`: create or update the durable behavior spec.
+- `/clarify`: resolve blocking ambiguity in one existing spec before planning.
+- `/to-plan`: create or update the active ExecPlan.
+- `/run`: execute the active plan through the Goal-Driven Execution loop.
+
+Each transition must be visible to the user:
+
+```text
+This can continue through /to-done, but the selected direction has not been
+pressure-tested yet. I am entering /grill-me to fill that context before
+writing the spec.
+```
+
+### 8.5 Materialize or reuse the spec
 
 - Search `docs/specs/` or the configured specs directory.
 - Reuse an existing matching spec when one clearly covers the work.
-- Create a minimal spec when no matching spec exists.
+- Create a minimal spec for clear small work when no matching spec exists.
+- Create a full spec for complex work when no matching spec exists.
 - Update `docs/specs/index.md`.
 - Do not mark the spec accepted unless the user explicitly accepts it or the
   repository has an approval convention.
 
-The minimal spec must still include:
+Every spec must include:
 
 - summary
 - goals
@@ -263,15 +349,16 @@ The minimal spec must still include:
 - acceptance criteria
 - assumptions and open questions
 
-### 8.5 Materialize or reuse the plan
+### 8.6 Materialize or reuse the plan
 
 - Search `docs/exec-plans/active/` for a plan that references the spec.
 - Reuse and update exactly one active plan when a clear match exists.
-- Create a minimal active ExecPlan when no match exists.
+- Create a minimal active ExecPlan for clear small work when no match exists.
+- Create a full active ExecPlan for complex work when no match exists.
 - Do not duplicate active plans for the same work.
 - Preserve completed checklist items when updating.
 
-The minimal plan must follow `docs/PLANS.md` and include:
+Every plan must follow `docs/PLANS.md` and include:
 
 - Goal
 - Context
@@ -283,9 +370,9 @@ The minimal plan must follow `docs/PLANS.md` and include:
 - Progress Log
 - Rollback
 
-### 8.6 Execute through `/run`
+### 8.7 Execute through `/run`
 
-After the minimal active plan exists, use `/run` semantics:
+After the active plan exists and is ready, use `/run` semantics:
 
 - execute ready pending checklist items
 - review the diff and behavior against the spec and plan
@@ -297,7 +384,7 @@ After the minimal active plan exists, use `/run` semantics:
 
 `/to-done` must not maintain a divergent execution loop.
 
-### 8.7 Update maps and records
+### 8.8 Update maps and records
 
 Always update:
 
@@ -322,11 +409,12 @@ When relevant, update:
 If the plan completes and verification passes, move it to completed when the
 repository convention allows it.
 
-### 8.8 Handoff
+### 8.9 Handoff
 
 Final response must include:
 
-- whether fast path eligibility passed
+- readiness path chosen
+- workflow stage transitions, if any
 - spec created or reused
 - plan created, reused, or completed
 - checklist items completed
@@ -340,9 +428,15 @@ Final response must include:
 
 - Conversation context can justify starting the command, but durable artifacts
   must carry the result.
+- Complex work is allowed only when complexity is represented in the spec,
+  plan, verification loop, and progress log.
 - Do not use `/to-done` for irreversible operations without explicit approval.
 - Do not use `/to-done` for work with unresolved security, data, compatibility,
   package distribution, or public workflow decisions.
+- Do not use `/to-done` to bypass `/grill-me` when a selected direction still
+  has consequential untested assumptions.
+- Do not use `/to-done` to bypass `/clarify` when an existing spec has
+  planning-blocking ambiguity.
 - Do not hide skipped verification behind a successful summary.
 - Do not move a plan to completed unless required verification passed or the
   blocker is explicitly recorded and the plan remains incomplete.
@@ -373,10 +467,15 @@ npm pack --dry-run
 
 Dogfood verification should cover:
 
-- `/to-done` from current-session context
-- `/to-done <brief>` for a one/two sentence request
-- fallback to `/to-spec` for unclear behavior
-- fallback to `/to-plan` for unresolved implementation strategy
+- `/to-done` from clear current-session context
+- `/to-done <brief>` for a clear small request
+- `/to-done <intent>` for a clear complex request that requires full spec and
+  full plan artifacts
+- routing to `/explore` for rough or unselected direction
+- routing to `/grill-me` for a selected but untested direction
+- routing to `/to-spec` for behavior that needs durable specification
+- routing to `/clarify` for an existing spec with planning-blocking ambiguity
+- routing to `/to-plan` for unresolved implementation strategy
 - delegation to `/run` for an existing active plan
 - failed verification recording without claiming done
 
@@ -391,11 +490,18 @@ Dogfood verification should cover:
 - README lists `/to-done` as a shipped command when implemented.
 - `agent-map.yaml` includes `/to-done` once implemented.
 - `/to-done` accepts clear current-session context.
-- `/to-done <brief>` accepts simple one/two sentence requests.
-- `/to-done` writes or reuses a minimal spec before planning.
-- `/to-done` writes or reuses a minimal ExecPlan before implementation.
+- `/to-done <brief>` accepts clear small requests.
+- `/to-done <intent>` accepts clear complex requests and creates full
+  artifacts when needed.
+- `/to-done` determines the readiness stage before implementation.
+- `/to-done` routes to `/explore`, `/grill-me`, `/to-spec`, `/clarify`,
+  `/to-plan`, or `/run` when that stage is required.
+- `/to-done` writes or reuses a spec before planning.
+- `/to-done` writes or reuses an ExecPlan before implementation.
+- `/to-done` uses minimal artifacts only for clear small work.
+- `/to-done` uses full artifacts for complex work.
 - `/to-done` delegates execution to `/run` semantics.
-- `/to-done` refuses unclear, risky, broad, or unverifiable work.
+- `/to-done` refuses unresolved ambiguity, risky work, or unverifiable work.
 - `/to-done` records verification failures exactly and does not claim done when
   checks fail.
 - Completed `/to-done` work has durable spec, plan, progress log,
@@ -408,10 +514,13 @@ Dogfood verification should cover:
 
 - [ASSUMED] `/to-done` should be a distinct command rather than expanding
   `/run`, because `/run` should remain scoped to executing existing plans.
-- [ASSUMED] A one/two sentence brief is eligible only when it includes both the
-  desired change and a completion signal.
+- [ASSUMED] `/to-done` is the correct user-facing command for "finish this"
+  intent, while the internal path still uses the specialized workflow commands.
+- [ASSUMED] A brief can be simple or complex, but implementation may start only
+  after the readiness gate has durable requirements, plan, and verification
+  context.
 - [ASSUMED] Minimal specs and plans may be short, but they must preserve all
   fields needed for future agents to continue without chat history.
-- [ASSUMED] The first `/to-done` implementation writes minimal specs and plans
-  to normal durable locations every time; an explicit preview mode can be
-  specified separately later.
+- [ASSUMED] Full specs and plans are required when complexity affects behavior,
+  architecture, compatibility, distribution, safety, or verification.
+- [ASSUMED] An explicit preview mode can be specified separately later.
