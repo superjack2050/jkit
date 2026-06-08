@@ -47,7 +47,9 @@ jkit v2 has separate commands for making work durable:
 
 - `/to-spec` turns unclear or new behavior into a reviewable spec.
 - `/to-plan` turns a plannable spec into an active ExecPlan.
-- `/run` executes the active plan through a Goal-Driven Execution loop.
+- `/run` executes the active plan through a Goal-Driven Execution loop and
+  chooses its execution strategy, including optional Codex `/goal` and
+  subagent use when appropriate.
 
 That deliberate separation is useful, but users often express the desired
 outcome as "finish this" rather than choosing the exact workflow command.
@@ -72,8 +74,8 @@ The key distinction is:
   and a full spec for complex work.
 - Materialize an active ExecPlan before implementation. Use a minimal plan for
   clear small work and a full plan for complex work.
-- Delegate execution semantics to `/run` rather than inventing a second
-  execution loop.
+- Delegate execution semantics and execution-strategy selection to `/run`
+  rather than inventing a second execution loop.
 - Review, repair, and verify before claiming done.
 - Record progress, verification, failures, and map updates durably.
 - Move completed plans to `docs/exec-plans/completed/` after final
@@ -172,9 +174,9 @@ Acceptance criteria:
   Verification, Decisions, Progress Log, and Rollback.
 - Minimal ExecPlans are used only for clear small work; complex work receives a
   full plan sized to the blast radius and verification needs.
-- The plan progress log records checklist status, verification commands and
-  results, failures or exceptions, doc-update decisions, generated-index status,
-  and new open questions.
+- The plan progress log records execution strategy when `/run` executes,
+  checklist status, verification commands and results, failures or exceptions,
+  doc-update decisions, generated-index status, and new open questions.
 - Generated indexes are refreshed when relevant.
 - Verification failures are recorded under
   `docs/records/verification-failures/` when they affect future agents.
@@ -319,7 +321,8 @@ instead of continuing inside `/to-done` as a black box:
 - `/to-spec`: create or update the durable behavior spec.
 - `/clarify`: resolve blocking ambiguity in one existing spec before planning.
 - `/to-plan`: create or update the active ExecPlan.
-- `/run`: execute the active plan through the Goal-Driven Execution loop.
+- `/run`: execute the active plan through the Goal-Driven Execution loop,
+  including `/run`'s execution strategy decision.
 
 Each transition must be visible to the user:
 
@@ -374,6 +377,9 @@ Every plan must follow `docs/PLANS.md` and include:
 
 After the active plan exists and is ready, use `/run` semantics:
 
+- let `/run` decide and record execution strategy before implementation
+- treat Codex `/goal` and subagents as `/run` runtime choices, not
+  `/to-done` shortcuts
 - execute ready pending checklist items
 - review the diff and behavior against the spec and plan
 - fix in-scope review findings
@@ -392,6 +398,7 @@ Always update:
 - active plan Progress Log
 - verification results
 - decisions
+- execution strategy selected by `/run`, if execution occurred
 - blockers, if any
 
 When relevant, update:
@@ -415,6 +422,7 @@ Final response must include:
 
 - readiness path chosen
 - workflow stage transitions, if any
+- `/run` execution strategy used, if execution occurred
 - spec created or reused
 - plan created, reused, or completed
 - checklist items completed

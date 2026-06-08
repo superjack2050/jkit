@@ -55,7 +55,8 @@ inside a "done" shortcut.
    follow that stage's skill/spec behavior instead of reimplementing it inside
    `/to-done`.
 6. **Use `/run` semantics.** Execution belongs to the Goal-Driven Execution
-   loop in `skills/run/SKILL.md`; do not create a second execution loop.
+   loop in `skills/run/SKILL.md`, including its execution strategy decision for
+   optional Codex `/goal` and subagents. Do not create a second execution loop.
 7. **No risky shortcut.** Stop for unresolved safety, data, compatibility,
    package distribution, public workflow, production, external-live, or
    irreversible-operation questions.
@@ -205,7 +206,8 @@ contract:
 - `/to-spec`: create or update the durable behavior spec.
 - `/clarify`: resolve blocking ambiguity in one existing spec before planning.
 - `/to-plan`: create or update the active ExecPlan.
-- `/run`: execute the active plan through the Goal-Driven Execution loop.
+- `/run`: execute the active plan through the Goal-Driven Execution loop,
+  including `/run`'s execution strategy decision.
 
 Use this transition shape:
 
@@ -324,6 +326,9 @@ Rules:
 After the active plan exists and is ready, read `skills/run/SKILL.md` and
 follow its Goal-Driven Execution loop:
 
+- let `/run` decide and record execution strategy before implementation
+- treat Codex `/goal` and subagents as `/run` runtime choices, not
+  `/to-done` shortcuts
 - execute ready pending checklist items
 - keep changes scoped to the spec and plan
 - review the diff and behavior against the spec and plan
@@ -377,6 +382,7 @@ Always update the active plan:
 - checklist statuses
 - Progress Log
 - Decisions
+- execution strategy selected by `/run`, if execution occurred
 - readiness path chosen
 - stage transitions, if any
 - review result
@@ -407,6 +413,7 @@ Final response must include:
 
 - readiness path chosen
 - workflow stage transitions, if any
+- `/run` execution strategy used, if execution occurred
 - spec created or reused
 - plan created, reused, or completed
 - checklist items completed

@@ -54,7 +54,12 @@ recorded.
    in-scope findings before claiming completion.
 6. **Verification or blocker.** Run the strongest local deterministic checks
    available. If they fail, fix and rerun while meaningful progress is possible.
-7. **Update maps before handoff.** Record progress, decisions, review findings,
+7. **Choose execution strategy deliberately.** Decide whether Codex `/goal` or
+   subagents are useful before editing; default to single-agent execution.
+8. **Primary agent owns completion.** Goal state and subagent output are inputs,
+   not completion proof. The primary `/run` agent reviews, verifies, records,
+   and hands off.
+9. **Update maps before handoff.** Record progress, decisions, review findings,
    verification, failures, generated-index refreshes, and remaining work.
 
 ## Phase 0 - Orient
@@ -140,25 +145,97 @@ Stop before editing when:
 If a checklist item is ambiguous but safe to narrow, ask one concise question
 or record `[NEEDS_INVESTIGATION]` in the plan.
 
-## Phase 3 - Track The Goal Loop
+## Phase 3 - Decide Execution Strategy
+
+Before editing, choose an execution strategy from the plan shape, runtime
+capabilities, task independence, risk level, and verification signals.
+
+Strategy has two independent facets:
+
+```text
+goal tracking: none | Codex /goal
+delegation: none | subagent review/investigation | subagent isolated implementation
+```
+
+Default:
+
+```text
+goal tracking: none
+delegation: none
+```
+
+Use Codex `/goal` only when:
+
+- the current runtime supports Codex `/goal`
+- the active plan has a clear goal and verifiable milestones
+- the work is long-running, has many checklist items, spans multiple sessions,
+  or is likely to require continuation
+- the active ExecPlan remains the durable source of truth for progress
+
+Skip Codex `/goal` when:
+
+- the runtime does not support it
+- the run is narrow, small, or likely to complete in one session
+- the plan is ambiguous or lacks verification
+- goal state would become the only progress record
+
+Use subagents for review or investigation when:
+
+- independent files, docs, tests, or code areas need parallel inspection
+- a bounded second-pass review would reduce risk before final verification
+- the subagent can return findings without modifying files
+
+Use subagents for isolated implementation only when:
+
+- checklist items are independent and low-conflict
+- file ownership is unlikely to overlap
+- acceptance criteria and focused verification are clear
+- each subagent can receive explicit scope, non-goals, and verification
+- the primary `/run` agent can review and integrate the output before marking
+  checklist items complete
+
+Do not use subagents when:
+
+- the work is safety-sensitive, destructive, external-live, migration-heavy, or
+  secret-bearing
+- the work is tightly coupled or likely to edit the same files
+- the spec or plan has unresolved ambiguity that changes behavior, safety,
+  data, compatibility, or irreversible operations
+- verification is unclear or cannot be run by the primary `/run` agent
+- delegation would obscure accountability for the final diff
+
+Record the selected strategy in the active plan progress log before or during
+execution:
+
+```text
+goal tracking: none | Codex /goal
+delegation: none | subagent review/investigation | subagent isolated implementation
+reason:
+subagent scopes, if any:
+review and verification approach:
+fallback reason when a useful capability is unavailable:
+```
+
+## Phase 4 - Track The Goal Loop
 
 Create task-tracking items for the selected run:
 
 ```text
-1. implement ready pending checklist items
-2. review diff and behavior against spec/plan
-3. fix in-scope review findings
-4. run verification
-5. update maps and records
+1. choose and record execution strategy
+2. implement ready pending checklist items
+3. review diff and behavior against spec/plan
+4. fix in-scope review findings
+5. run verification
+6. update maps and records
 ```
 
 For long plans, include each pending checklist item as a task. Keep the task
 list scoped to the selected plan unless the user explicitly expands scope.
 
-Record the selected plan, goal, and whether the run is full-plan or narrow in
-your working notes before editing.
+Record the selected plan, goal, execution strategy, and whether the run is
+full-plan or narrow in your working notes before editing.
 
-## Phase 4 - Execute Pending Checklist Items
+## Phase 5 - Execute Pending Checklist Items
 
 Implement pending checklist items in dependency order.
 
@@ -172,17 +249,23 @@ Rules:
   to edit them directly.
 - If a new decision appears, resolve it through evidence, user confirmation, or
   an explicit `[NEEDS_INVESTIGATION]` entry before continuing.
+- If subagents are used, give each subagent a bounded prompt tied to one
+  checklist item, review task, or investigation question.
+- Integrate subagent outputs one at a time.
+- Re-read files modified by subagents before relying on them.
+- Treat subagent findings as inputs, not completion proof.
 
 After each checklist item:
 
 1. Run focused verification for that checklist item when available.
-2. Mark the checklist item complete only if focused verification passed.
-3. Leave it unchecked and record the blocker if verification failed or could
+2. Review any subagent output involved in the item.
+3. Mark the checklist item complete only if focused verification passed.
+4. Leave it unchecked and record the blocker if verification failed or could
    not be run.
 
 Continue to the next ready checklist item while meaningful progress is possible.
 
-## Phase 5 - Review And Repair
+## Phase 6 - Review And Repair
 
 After implementing the ready work queue, review before final verification:
 
@@ -199,6 +282,8 @@ Inspect changed files and check:
 - Were generated files refreshed instead of hand-edited when appropriate?
 - Are docs, records, and indexes aligned with changed behavior?
 - Are there obvious regressions, missing checks, or stale references?
+- If subagents were used, did each output stay in scope, avoid conflicting
+  edits, and receive primary-agent review?
 
 For in-scope findings:
 
@@ -211,7 +296,7 @@ For out-of-scope findings:
 - record them as open questions, tech debt, or follow-up plan items
 - do not let them silently expand the current run
 
-## Phase 6 - Verification Loop
+## Phase 7 - Verification Loop
 
 Run verification in this order:
 
@@ -233,6 +318,7 @@ For this repository, common checks are:
 ./scripts/agent-map-check
 ./scripts/agent-map-generate
 node bin/jkit.js status
+./scripts/codex-plugin-check
 npm pack --dry-run
 ```
 
@@ -248,10 +334,13 @@ if checks fail and no meaningful progress remains: record blocker
 Do not treat file-existence checks as enough when stronger project checks are
 available. Do not run external live checks unless explicitly approved.
 
-## Phase 7 - Update Maps
+## Phase 8 - Update Maps
 
 Always update the active plan:
 
+- execution strategy selected for this run
+- Codex `/goal` usage, if any
+- subagent scopes and outcomes, if any
 - checklist statuses
 - progress log
 - decisions
@@ -261,6 +350,10 @@ Always update the active plan:
 
 Each progress log entry for a run must include:
 
+- selected execution strategy and reason
+- whether Codex `/goal` was used, skipped, or unavailable
+- whether subagents were used, skipped, or unavailable
+- subagent scopes and reviewed outputs, when used
 - checklist items completed in this run
 - current status of each touched checklist item
 - verification commands executed and their results
@@ -293,12 +386,17 @@ If every checklist item is complete and final verification passed, either move
 the plan to `docs/exec-plans/completed/` when repository convention allows it
 or record that it is ready to complete.
 
-## Phase 8 - Completion Protocol
+## Phase 9 - Completion Protocol
 
 Before final response, answer these internally:
 
 ```text
 Did implementation stay within the selected plan and referenced specs?
+Was the execution strategy chosen and recorded?
+If Codex /goal was used, did the active ExecPlan remain the durable source of
+truth?
+If subagents were used, were their scopes bounded and their outputs reviewed by
+the primary /run agent?
 Were all ready pending checklist items executed?
 Were checklist items marked complete only after focused verification passed?
 Was the resulting diff reviewed?
@@ -307,9 +405,9 @@ Did required verification pass?
 Were failures recorded exactly?
 Were maps updated for changed behavior or workflow?
 Were generated indexes refreshed when needed?
-Did the active plan progress log include checklist status, verification
-commands and results, failures or exceptions, doc-update decisions, generated
-index status, and new open questions?
+Did the active plan progress log include execution strategy, checklist status,
+verification commands and results, failures or exceptions, doc-update
+decisions, generated index status, and new open questions?
 ```
 
 If any answer is no, record why in the plan or records before handing off.
@@ -319,6 +417,8 @@ If any answer is no, record why in the plan or records before handing off.
 Summarize:
 
 - plan and goal executed
+- execution strategy used
+- Codex `/goal` or subagent usage, if any
 - checklist items completed
 - files changed
 - review result

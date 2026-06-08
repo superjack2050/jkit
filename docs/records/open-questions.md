@@ -28,9 +28,9 @@ should not silently guess.
   while preserving Claude Code plugin metadata and wrappers.
 - jkit uses `@nobodyjack/jkit` as the npm package name.
 - `@nobodyjack/jkit@0.9.0`, `@nobodyjack/jkit@0.9.1`,
-  `@nobodyjack/jkit@0.9.2`, and `@nobodyjack/jkit@0.9.3` are published on npm.
-- The local runtime-update-check package state starts at
-  `@nobodyjack/jkit@0.9.4`.
+  `@nobodyjack/jkit@0.9.2`, `@nobodyjack/jkit@0.9.3`, and
+  `@nobodyjack/jkit@0.9.4` are published on npm.
+- The local package state is prepared for `@nobodyjack/jkit@0.9.5`.
 - npm publishing uses `npm publish --access public`; if npm explicitly
   requires OTP or browser/passkey confirmation for the active account, complete
   that interactive npm auth step outside non-interactive agent execution.

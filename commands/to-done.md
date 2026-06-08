@@ -14,6 +14,8 @@ Drive an intent to verified done by choosing the shortest safe jkit path:
 - Use full specs and plans for complex work.
 - Delegate execution semantics to `/run`; do not create a separate execution
   loop.
+- When entering `/run`, let `/run` choose and record execution strategy,
+  including optional Codex `/goal` and subagent use.
 - Review, repair, verify, update maps, and record failures before claiming
   done.
 - Move the plan to completed only when required verification passes.

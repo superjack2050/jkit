@@ -23,6 +23,14 @@ delivery loop: follow the spec and plan, complete the plan's pending work,
 review the result, fix issues, rerun verification, and stop only when the work
 is genuinely done or a clear blocker is recorded.
 
+Before editing, `/run` chooses an execution strategy from the selected
+ExecPlan. The default is single-agent execution. When the runtime supports it,
+`/run` may use Codex `/goal` for long-running goal tracking, and may use
+subagents for bounded review, investigation, or isolated implementation. These
+are optional runtime capabilities, not requirements, and the primary `/run`
+agent remains accountable for final review, verification, progress logging, and
+map updates.
+
 ## 2. Goals
 
 - Locate the relevant active ExecPlan.
@@ -42,6 +50,13 @@ is genuinely done or a clear blocker is recorded.
 - Refresh generated indexes when source layout, docs indexes, or package layout
   changes.
 - Keep late-discovered ambiguity visible instead of silently choosing.
+- Choose and record an execution strategy before implementation.
+- Use Codex `/goal` when available and useful for long-running or resumable
+  plan execution.
+- Use subagents only when the selected plan contains independent, low-conflict,
+  verifiable work or bounded review/investigation tasks.
+- Keep the primary `/run` agent responsible for final integration, review,
+  verification, and handoff even when goals or subagents are used.
 
 ## 3. Non-goals
 
@@ -57,6 +72,14 @@ is genuinely done or a clear blocker is recorded.
   absent, skipped, failing, or blocked.
 - Do not hide failures behind "best effort" summaries; record exact failed
   commands and the next action.
+- Do not require Codex `/goal`; `/run` must remain portable to runtimes that
+  do not expose goal-tracking features.
+- Do not spawn subagents for ambiguous, high-risk, destructive, external-live,
+  secret-bearing, or tightly coupled work.
+- Do not let subagents expand the selected plan's scope, bypass approval
+  boundaries, or mark checklist items complete.
+- Do not delegate final diff review, final verification, progress-log updates,
+  records, generated-index refreshes, or final completion claims.
 
 ## 4. User stories
 
@@ -156,6 +179,26 @@ Acceptance criteria:
 - Active plans reflect completed checklist items, blockers, decisions, and
   verification results.
 
+### 4.7 Choose goal tracking and subagents deliberately
+
+As a user running a complex plan, I want `/run` to decide whether Codex
+`/goal` or subagents would improve execution without making the run less
+verifiable.
+
+Acceptance criteria:
+
+- Before editing, the command classifies the selected run's execution strategy.
+- The command considers Codex `/goal` separately from subagent delegation.
+- Codex `/goal` is used only when the runtime supports it and the plan is
+  long-running, milestone-oriented, or likely to require continuation.
+- Subagents are used only for bounded, independent, low-conflict work with clear
+  acceptance and verification signals.
+- Subagents may be used for review, investigation, or isolated implementation,
+  but the primary `/run` agent reviews and integrates the result.
+- The active plan progress log records the chosen strategy and the reason.
+- If goals or subagents were considered but not used, the progress log records
+  the short reason when it matters for future continuation.
+
 ## 5. Command behavior
 
 User-facing command:
@@ -223,7 +266,74 @@ Default behavior:
 - Identify verification commands and acceptance criteria.
 - Stop if the plan has no verifiable outcome.
 
-### 6.4 Execute pending checklist items
+### 6.4 Decide execution strategy
+
+Before editing, decide and record the execution strategy.
+
+Execution strategy has two independent facets:
+
+```text
+goal tracking: none | Codex /goal
+delegation: none | subagent review/investigation | subagent isolated implementation
+```
+
+Default:
+
+```text
+goal tracking: none
+delegation: none
+```
+
+Use Codex `/goal` when all are true:
+
+- the current runtime supports Codex `/goal`
+- the selected plan has a clear goal and verifiable milestones
+- the work is long-running, has many checklist items, spans multiple sessions,
+  or is likely to need continuation
+- goal tracking will not replace the active ExecPlan progress log
+
+Do not use Codex `/goal` when:
+
+- the runtime does not support it
+- the run is a narrow item or small one-session change
+- the plan is ambiguous or missing verification
+- goal state would become the only durable record of progress
+
+Use subagents for review or investigation when:
+
+- independent files, docs, tests, or code areas need parallel inspection
+- a bounded second-pass review would reduce risk before final verification
+- the subagent can return findings without modifying files
+
+Use subagents for isolated implementation only when:
+
+- the plan or obvious checklist structure contains independent items
+- file ownership is low-conflict
+- acceptance criteria and focused verification are clear
+- each subagent can receive a bounded prompt with explicit scope and non-goals
+- the primary `/run` agent can review and integrate the result before marking
+  checklist items complete
+
+Do not use subagents when:
+
+- the work is safety-sensitive, destructive, external-live, migration-heavy, or
+  secret-bearing
+- multiple agents would edit the same files or tightly coupled behavior
+- the spec or plan has unresolved ambiguity that changes behavior, safety,
+  data, compatibility, or irreversible operations
+- verification is unclear or cannot be run by the primary `/run` agent
+- delegation would obscure accountability for the final diff
+
+Record in the active plan progress log before or during execution:
+
+- selected goal-tracking mode
+- selected delegation mode
+- reason for the strategy
+- subagent scopes, if any
+- how subagent output will be reviewed and verified
+- fallback reason when a useful runtime capability is unavailable
+
+### 6.5 Execute pending checklist items
 
 - Execute all unchecked checklist items in dependency order by default.
 - Keep changes scoped to the selected plan and referenced specs.
@@ -234,8 +344,15 @@ Default behavior:
   external integrations, compatibility, public workflow, or irreversible
   operations.
 - Mark each checklist item complete only after its focused verification passes.
+- If subagents are used, give each subagent a bounded task tied to one checklist
+  item, review task, or investigation question.
+- Integrate subagent outputs one at a time.
+- Re-read modified files before relying on subagent changes.
+- Treat subagent findings as inputs, not completion proof.
+- The primary `/run` agent marks checklist items complete only after reviewing
+  the result and running relevant focused verification.
 
-### 6.5 Review and repair
+### 6.6 Review and repair
 
 - Inspect the diff and touched files.
 - Check the implementation against the plan, referenced specs, and acceptance
@@ -244,8 +361,11 @@ Default behavior:
 - Record out-of-scope findings as open questions, tech debt, or follow-up plan
   items.
 - Do not proceed to final handoff while known in-scope review findings remain.
+- If subagents contributed findings or changes, explicitly review whether each
+  output stayed within scope, avoided conflicting edits, and has verification
+  coverage.
 
-### 6.6 Verify
+### 6.7 Verify
 
 Run verification in this order:
 
@@ -266,6 +386,7 @@ For this repository, common checks are:
 ./scripts/agent-map-check
 ./scripts/agent-map-generate
 node bin/jkit.js status
+./scripts/codex-plugin-check
 npm pack --dry-run
 ```
 
@@ -279,10 +400,13 @@ If verification fails:
 
 Do not run external live checks unless explicitly approved.
 
-### 6.7 Update maps
+### 6.8 Update maps
 
 Always update the active plan:
 
+- execution strategy selected for this run
+- Codex `/goal` usage, if any
+- subagent scopes and outcomes, if any
 - checklist statuses
 - progress log
 - decisions
@@ -292,6 +416,10 @@ Always update the active plan:
 
 The progress log entry for each run must include:
 
+- selected execution strategy and reason
+- whether Codex `/goal` was used, skipped, or unavailable
+- whether subagents were used, skipped, or unavailable
+- subagent scopes and reviewed outputs, when used
 - checklist items completed in this run
 - current status of each touched checklist item
 - verification commands executed and their results
@@ -321,11 +449,13 @@ When relevant, update:
 If work happened outside the expected flow, add a record under
 `docs/records/workflow-exceptions/`.
 
-### 6.8 Handoff
+### 6.9 Handoff
 
 Final response must include:
 
 - plan executed
+- execution strategy used
+- Codex `/goal` or subagent usage, if any
 - checklist items completed
 - files changed
 - review result
@@ -339,6 +469,11 @@ Before final response, `/run` must answer:
 
 ```text
 Did implementation stay within the selected plan and referenced specs?
+Was the execution strategy chosen and recorded before or during execution?
+If Codex /goal was used, did the active ExecPlan remain the durable source of
+truth?
+If subagents were used, were their scopes bounded and their outputs reviewed by
+the primary /run agent?
 Were all ready pending checklist items executed?
 Were checklist items marked complete only after focused verification passed?
 Was the resulting diff reviewed?
@@ -347,9 +482,9 @@ Did required verification pass?
 Were failures recorded exactly?
 Were maps updated for changed behavior or workflow?
 Were generated indexes refreshed when needed?
-Did the active plan progress log include checklist status, verification
-commands and results, failures or exceptions, doc-update decisions, generated
-index status, and new open questions?
+Did the active plan progress log include execution strategy, checklist status,
+verification commands and results, failures or exceptions, doc-update
+decisions, generated index status, and new open questions?
 ```
 
 If any answer is no, record why in the plan or records before handing off.
@@ -363,6 +498,13 @@ If any answer is no, record why in the plan or records before handing off.
 - `/run` defaults to executing all pending checklist items in the selected
   active plan.
 - `/run --item` allows an explicit narrow execution.
+- `/run` chooses and records an execution strategy before implementation.
+- `/run` treats Codex `/goal` as an optional runtime goal-tracking capability,
+  not as a portable requirement.
+- `/run` may use subagents only for bounded, independent, verifiable work or
+  review/investigation.
+- `/run` keeps the primary agent accountable for final integration, review,
+  verification, maps, and handoff when subagents are used.
 - The run skill includes review-and-repair behavior.
 - The run skill requires verification checks to pass before claiming
   completion.
