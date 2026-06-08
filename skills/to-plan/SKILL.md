@@ -84,6 +84,7 @@ exists. If multiple candidates exist, ask which spec to plan.
 Run and read:
 
 ```bash
+jkit update-check --quiet 2>/dev/null || true
 pwd
 git status --short
 ```

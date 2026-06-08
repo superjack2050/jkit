@@ -61,6 +61,7 @@ Use templates as shape references, adapting them to discovered project facts.
 Run these checks from the user's current project directory:
 
 ```bash
+jkit update-check --quiet 2>/dev/null || true
 pwd
 git rev-parse --show-toplevel 2>/dev/null || true
 git status --short 2>/dev/null || true

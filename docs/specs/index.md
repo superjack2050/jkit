@@ -19,6 +19,8 @@ Specs define command behavior and user-visible workflow contracts.
   maps.
 - `runtime-install.md`: runtime-specific install UX, npm package name, and
   bilingual README.
-- `to-done.md`: fast-path orchestration from clear intent to verified done.
+- `runtime-update-check.md`: non-blocking update notices for common jkit
+  workflow commands.
+- `to-done.md`: adaptive orchestration from intent to verified done.
 - `to-plan.md`: convert reviewable specs into executable ExecPlans.
 - `to-spec.md`: convert unclear or new behavior requests into reviewable specs.

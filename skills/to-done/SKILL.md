@@ -88,6 +88,7 @@ If multiple specs or plans plausibly match, ask which one to use.
 Run and read:
 
 ```bash
+jkit update-check --quiet 2>/dev/null || true
 pwd
 git status --short
 ```

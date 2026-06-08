@@ -78,6 +78,18 @@ An agent map gives coding agents the project entry points, workflow rules,
 records, plans, generated indexes, and verification commands they need to work
 from repository state instead of chat history alone.
 
+### Version update notices
+
+jkit workflow commands run a non-blocking version check during startup. When a
+new npm version is available, they show a short notice. If npm or the network is
+unavailable, the workflow continues.
+
+Manual check:
+
+```bash
+jkit update-check
+```
+
 ## Workflow
 
 The current shipped workflow is:

@@ -69,6 +69,7 @@ What rough idea should we explore, and what outcome would make it worth doing?
 Run and read when available:
 
 ```bash
+jkit update-check --quiet 2>/dev/null || true
 pwd
 git status --short
 ```

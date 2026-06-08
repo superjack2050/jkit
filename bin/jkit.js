@@ -11,9 +11,13 @@ const path = require('path');
 const childProcess = require('child_process');
 
 const PKG_ROOT = path.resolve(__dirname, '..');
+const PACKAGE_JSON = path.join(PKG_ROOT, 'package.json');
+const PACKAGE_NAME = '@nobodyjack/jkit';
 const SKILLS_SRC = path.join(PKG_ROOT, 'skills');
 const SKILLS_DST = path.join(os.homedir(), '.claude', 'skills');
 const SKILL_NAMES = ['jkit', 'map-init', 'explore', 'grill-me', 'clarify', 'to-spec', 'to-plan', 'to-done', 'run'];
+const UPDATE_CHECK_TTL_MS = 24 * 60 * 60 * 1000;
+const UPDATE_CHECK_CACHE = path.join(os.homedir(), '.cache', 'jkit', 'update-check.json');
 const CODEX_PLUGIN_NAME = 'jkit';
 const CODEX_MARKETPLACE_NAME = 'personal';
 const CODEX_PLUGIN_SELECTOR = `${CODEX_PLUGIN_NAME}@${CODEX_MARKETPLACE_NAME}`;
@@ -67,6 +71,189 @@ function runCodex(args) {
   }
 
   return result.stdout || '';
+}
+
+function runCommand(command, args) {
+  const result = childProcess.spawnSync(command, args, {
+    encoding: 'utf8',
+  });
+
+  if (result.error && result.error.code === 'ENOENT') {
+    throw new Error(`missing ${command} command`);
+  }
+  if (result.error) {
+    throw result.error;
+  }
+  if (result.status !== 0) {
+    const output = [result.stderr, result.stdout].filter(Boolean).join('\n').trim();
+    throw new Error(output || `${command} ${args.join(' ')} failed`);
+  }
+
+  return (result.stdout || '').trim();
+}
+
+function getLocalVersion() {
+  return readJson(PACKAGE_JSON).version;
+}
+
+function compareVersions(left, right) {
+  const parse = (version) =>
+    String(version || '')
+      .trim()
+      .replace(/^v/, '')
+      .split(/[+-]/)[0]
+      .split('.')
+      .map((part) => Number.parseInt(part, 10) || 0);
+
+  const a = parse(left);
+  const b = parse(right);
+  const length = Math.max(a.length, b.length, 3);
+
+  for (let index = 0; index < length; index += 1) {
+    const delta = (a[index] || 0) - (b[index] || 0);
+    if (delta > 0) return 1;
+    if (delta < 0) return -1;
+  }
+  return 0;
+}
+
+function readUpdateCache(now) {
+  try {
+    const cache = readJson(UPDATE_CHECK_CACHE);
+    if (!cache || cache.packageName !== PACKAGE_NAME || !cache.checkedAt || !cache.latestVersion) {
+      return null;
+    }
+    const checkedAt = Date.parse(cache.checkedAt);
+    if (!Number.isFinite(checkedAt) || now - checkedAt > UPDATE_CHECK_TTL_MS) {
+      return null;
+    }
+    return cache;
+  } catch (_) {
+    return null;
+  }
+}
+
+function writeUpdateCache(cache) {
+  try {
+    writeJson(UPDATE_CHECK_CACHE, cache);
+  } catch (_) {
+    // Update checks are best-effort and must never block workflow commands.
+  }
+}
+
+function fetchLatestVersion() {
+  const raw = runCommand('npm', ['view', PACKAGE_NAME, 'version', '--json']);
+  return JSON.parse(raw);
+}
+
+function checkForUpdate(options = {}) {
+  const now = Date.now();
+  const localVersion = getLocalVersion();
+  const cached = options.noCache ? null : readUpdateCache(now);
+
+  if (cached) {
+    const updateAvailable = compareVersions(cached.latestVersion, localVersion) > 0;
+    return {
+      packageName: PACKAGE_NAME,
+      localVersion,
+      latestVersion: cached.latestVersion,
+      updateAvailable,
+      cached: true,
+      checkedAt: cached.checkedAt,
+      error: null,
+    };
+  }
+
+  const checkedAt = new Date(now).toISOString();
+
+  try {
+    const latestVersion = fetchLatestVersion();
+    const updateAvailable = compareVersions(latestVersion, localVersion) > 0;
+    const result = {
+      packageName: PACKAGE_NAME,
+      localVersion,
+      latestVersion,
+      updateAvailable,
+      cached: false,
+      checkedAt,
+      error: null,
+    };
+    writeUpdateCache({
+      packageName: PACKAGE_NAME,
+      latestVersion,
+      checkedAt,
+    });
+    return result;
+  } catch (error) {
+    return {
+      packageName: PACKAGE_NAME,
+      localVersion,
+      latestVersion: null,
+      updateAvailable: false,
+      cached: false,
+      checkedAt,
+      error: error.message,
+    };
+  }
+}
+
+function updateNotice(result) {
+  return [
+    `[jkit] update available: ${result.latestVersion} (current ${result.localVersion})`,
+    '[jkit] update after this run: npm install -g @nobodyjack/jkit && jkit codex install',
+  ].join('\n');
+}
+
+function doVersion() {
+  console.log(getLocalVersion());
+}
+
+function doUpdateCheck(rawArgs) {
+  const options = {
+    quiet: false,
+    json: false,
+    noCache: false,
+  };
+
+  for (const arg of rawArgs) {
+    switch (arg) {
+      case '--quiet':
+        options.quiet = true;
+        break;
+      case '--json':
+        options.json = true;
+        break;
+      case '--no-cache':
+        options.noCache = true;
+        break;
+      default:
+        throw new Error(`unknown update-check argument: ${arg}`);
+    }
+  }
+
+  const result = checkForUpdate(options);
+
+  if (options.json) {
+    console.log(JSON.stringify(result, null, 2));
+    return;
+  }
+
+  if (result.updateAvailable) {
+    console.log(updateNotice(result));
+    return;
+  }
+
+  if (options.quiet) {
+    return;
+  }
+
+  if (result.error) {
+    log(`· update check unavailable: ${result.error}`);
+    return;
+  }
+
+  const cacheText = result.cached ? 'cached ' : '';
+  log(`✓ ${PACKAGE_NAME} is up to date (${result.localVersion}, ${cacheText}latest ${result.latestVersion})`);
 }
 
 function resolveSymlink(linkPath) {
@@ -434,6 +621,10 @@ Usage:
   jkit claude-code status     Check local Claude Code skill symlinks
 
   jkit status                 Check Claude Code and Codex state
+  jkit version                Print the local jkit package version
+  jkit update-check           Check npm for a newer jkit version (24h cache)
+  jkit update-check --quiet   Print only when an update is available
+  jkit update-check --json    Print machine-readable update status
   jkit --help                 Show this message
 `);
 }
@@ -499,6 +690,13 @@ try {
     case 'status':
       assertNoExtra(args.slice(1));
       doStatus();
+      break;
+    case 'version':
+      assertNoExtra(args.slice(1));
+      doVersion();
+      break;
+    case 'update-check':
+      doUpdateCheck(args.slice(1));
       break;
     case '-h':
     case '--help':

@@ -31,6 +31,8 @@ Overall: 8 / 10
   the existing `skills/` bundle.
 - Runtime install support is explicit: Claude Code uses plugin marketplace, and
   Codex uses `npm install -g @nobodyjack/jkit` plus `jkit codex install`.
+- Workflow commands run a non-blocking update check during orientation, backed
+  by a cached CLI registry check.
 - Specs and ExecPlans now live under `docs/`.
 - Lightweight map check and generated repo map scripts exist.
 
@@ -41,6 +43,18 @@ Overall: 8 / 10
 - No fixture-based eval harness exists yet.
 
 ## Last Verification
+
+On 2026-06-08, runtime update-check implementation checks passed:
+
+- `node -c bin/jkit.js`
+- `node bin/jkit.js version`
+- `node bin/jkit.js update-check --json --no-cache`
+- `node bin/jkit.js update-check --quiet --no-cache`
+- static scan confirmed all jkit skills call
+  `jkit update-check --quiet 2>/dev/null || true`
+- `./scripts/agent-map-check`
+- `./scripts/codex-plugin-check`
+- `npm pack --dry-run --json`
 
 On 2026-06-08, `/to-done` adaptive orchestration implementation checks passed:
 

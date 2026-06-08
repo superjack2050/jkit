@@ -78,6 +78,7 @@ instead of forcing `/grill-me`.
 Run and read when available:
 
 ```bash
+jkit update-check --quiet 2>/dev/null || true
 pwd
 git status --short
 ```

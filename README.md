@@ -75,6 +75,17 @@ jkit codex status
 agent map 会为 coding agent 提供项目入口、工作流规则、记录、计划、
 generated indexes 和验证命令，让 agent 能基于仓库状态工作，而不是只依赖聊天历史。
 
+### 版本更新提示
+
+jkit workflow commands 会在启动时运行非阻塞版本检查。若 npm 上有新版本，
+会显示简短提示；若网络或 npm 不可用，命令会继续执行。
+
+手动检查：
+
+```bash
+jkit update-check
+```
+
 ## Workflow
 
 当前已发布的工作流是：

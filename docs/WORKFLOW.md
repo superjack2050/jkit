@@ -28,24 +28,26 @@ Done when:
 ## Default Flow
 
 1. Read `AGENTS.md`, `agent-map.yaml`, and the relevant docs.
-2. Use `/explore` when the request is a rough requirement or needs solution
+2. Run `jkit update-check --quiet 2>/dev/null || true` during command
+   orientation when available. Treat it as a non-blocking notice only.
+3. Use `/explore` when the request is a rough requirement or needs solution
    direction comparison before spec writing.
-3. Use `/grill-me` when a selected requirement or solution direction needs
+4. Use `/grill-me` when a selected requirement or solution direction needs
    one-question-at-a-time pressure testing before spec writing.
-4. Use `/to-spec` or update a spec under `docs/specs/` for new command
+5. Use `/to-spec` or update a spec under `docs/specs/` for new command
    behavior.
-5. Use `/clarify` when an existing spec has blocking ambiguity that would force
+6. Use `/clarify` when an existing spec has blocking ambiguity that would force
    `/to-plan` to invent decisions.
-6. Use `/to-plan` to create or update an ExecPlan under
+7. Use `/to-plan` to create or update an ExecPlan under
    `docs/exec-plans/active/` for complex work.
-7. Use `/run` to drive the active plan's Goal-Driven Execution loop.
-8. Let `/run` execute ready pending checklist items, review the diff, fix
+8. Use `/run` to drive the active plan's Goal-Driven Execution loop.
+9. Let `/run` execute ready pending checklist items, review the diff, fix
    in-scope issues, and rerun verification until it passes or records a
    blocker.
-9. Update progress, verification, records, and generated indexes.
-10. Use an explicit narrow run only when the user asks for a specific checklist
+10. Update progress, verification, records, and generated indexes.
+11. Use an explicit narrow run only when the user asks for a specific checklist
    item.
-11. Record workflow exceptions when work happened outside this flow.
+12. Record workflow exceptions when work happened outside this flow.
 
 ## Adaptive To Done
 

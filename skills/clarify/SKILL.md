@@ -83,6 +83,7 @@ If multiple specs plausibly match, ask which spec to clarify before editing.
 Run and read:
 
 ```bash
+jkit update-check --quiet 2>/dev/null || true
 pwd
 git status --short
 ```

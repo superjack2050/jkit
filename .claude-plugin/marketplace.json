@@ -9,7 +9,7 @@
       "name": "jkit",
       "source": "./",
       "description": "Agent-map toolkit for Claude Code and Codex. jkit shows workflow help; map-init creates repository harnesses; explore shapes rough requirements; grill-me pressure-tests selected directions; clarify resolves spec blockers; to-spec writes specs; to-plan creates plans; to-done adaptively routes intent to verified done; run drives plans through verified goal loops.",
-      "version": "0.9.3"
+      "version": "0.9.4"
     }
   ]
 }

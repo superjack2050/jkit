@@ -62,6 +62,7 @@ recorded.
 Run and read:
 
 ```bash
+jkit update-check --quiet 2>/dev/null || true
 pwd
 git status --short
 ```

@@ -1,6 +1,6 @@
 {
   "name": "jkit",
-  "version": "0.9.3",
+  "version": "0.9.4",
   "description": "Agent-map toolkit for Claude Code and Codex. Initializes repository harnesses, explores, pressure-tests and clarifies requirements, writes specs, creates plans, adaptively routes intent to done, and drives active plans through verified goal loops.",
   "author": {
     "name": "jack.xie",

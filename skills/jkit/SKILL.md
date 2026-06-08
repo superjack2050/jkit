@@ -21,6 +21,16 @@ This is not a workflow stage. Do not write specs, create plans, edit files,
 implement code, or run verification unless the user explicitly asks for that
 action.
 
+## Phase 0 - Update Check
+
+Run when available:
+
+```bash
+jkit update-check --quiet 2>/dev/null || true
+```
+
+Continue silently if the command is unavailable or the check fails.
+
 ## Output Shape
 
 Reply with concise help:

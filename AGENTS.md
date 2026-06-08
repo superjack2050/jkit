@@ -48,6 +48,8 @@ the full manual. Load deeper context from `docs/` only when the task needs it.
 ## Common Commands
 
 - Check runtime install state: `node bin/jkit.js status`
+- Check local package version: `node bin/jkit.js version`
+- Check npm update availability: `node bin/jkit.js update-check`
 - Check Codex plugin registration: `node bin/jkit.js codex status`
 - Check Claude Code local symlink fallback: `node bin/jkit.js claude-code status`
 - Package dry run: `npm pack --dry-run`
