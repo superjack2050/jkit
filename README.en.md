@@ -99,6 +99,26 @@ The current shipped workflow is:
                                                \-> /to-done ->/
 ```
 
+### Common workflows
+
+| Situation | Recommended path |
+|---|---|
+| New repository or missing agent map | `/map-init` |
+| Rough need or unselected direction | `/explore` -> `/to-done` |
+| Selected direction with unresolved key decisions | `/grill-me` -> `/to-spec` -> `/to-done <spec>` |
+| Clear requirement, ready to finish | `/to-done <intent>` |
+| Existing spec, continue to completion | `/to-done <spec>` |
+| Existing active ExecPlan, execute the plan | `/run <plan>` |
+| Existing spec has planning blockers | `/clarify <spec>` -> `/to-plan <spec>` -> `/run <plan>` |
+
+Default mental model:
+
+- If it is unclear, start with `/explore`.
+- If it is clear, use `/to-done`.
+- If an active plan already exists, use `/run`.
+- If you want a human spec review gate, use `/to-spec` first, then
+  `/to-done <spec>` after review.
+
 ### Explore requirements and shape direction
 
 Use `/explore` when the request is still rough. It helps discuss the need,
@@ -106,7 +126,7 @@ compare solution directions, identify risks, and produce a recommended
 direction plus ready input for `/to-spec`.
 
 Use `/grill-me` when the direction has been selected but key decisions still
-need to be questioned. It clarifies scope, boundaries, acceptance, and
+need review. It clarifies scope, boundaries, acceptance, and
 verification signals, then produces ready input for `/to-spec`.
 
 ### Write and clarify specs
@@ -144,7 +164,7 @@ plan, and broader verification.
 | `/jkit` or `$jkit` | Show jkit workflow help, list available commands, and route to the next step |
 | `/map-init` | Initialize the repository-level agent map with agent-readable project entry points, workflows, records, and verification rules |
 | `/explore` | Discuss a rough requirement, compare solution directions, and produce ready input for `/to-spec`; inspired by [`obra/superpowers`](https://github.com/obra/superpowers) `brainstorming` |
-| `/grill-me` | Question a selected requirement and solution direction one step at a time, clarify key decisions, and produce ready input for `/to-spec`; inspired by [`mattpocock/skills`](https://github.com/mattpocock/skills) `/grill-me` |
+| `/grill-me` | Review a selected requirement and solution direction one step at a time, clarify key decisions, and produce ready input for `/to-spec`; inspired by [`mattpocock/skills`](https://github.com/mattpocock/skills) `/grill-me` |
 | `/clarify` | Resolve planning-blocking ambiguity in one existing spec and write the clarifications back before `/to-plan`; inspired by [`github/spec-kit`](https://github.com/github/spec-kit) `/speckit.clarify` |
 | `/to-spec` | Create or update one reviewable spec from explicit input, current session context, or the repo/project base |
 | `/to-plan` | Convert a reviewable spec into an active ExecPlan with a Checklist and Verification Loop |

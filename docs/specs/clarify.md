@@ -16,7 +16,7 @@ It fits into the jkit v2 workflow after spec writing:
 ```
 
 `/clarify` is requirements QA for an existing spec. It does not discover broad
-directions, pressure-test a selected direction from scratch, write a new spec,
+directions, review a selected direction from scratch, write a new spec,
 create an ExecPlan, or implement code. Its job is to make an existing spec
 plannable by resolving the questions that would otherwise block `/to-plan`.
 
@@ -24,7 +24,7 @@ plannable by resolving the questions that would otherwise block `/to-plan`.
 
 jkit now has pre-spec commands for requirements exploration and pressure
 testing. `/explore` turns a rough idea into a recommended direction.
-`/grill-me` pressure-tests a selected requirement and solution direction before
+`/grill-me` reviews a selected requirement and solution direction before
 `/to-spec`.
 
 After `/to-spec`, a draft spec may still contain blocking ambiguity:
@@ -55,7 +55,7 @@ evidence and update the spec instead of asking the user to restate known facts.
 ## 4. Non-goals
 
 - Do not explore rough ideas; use `/explore`.
-- Do not pressure-test an unwritten requirement and solution direction; use
+- Do not review an unwritten requirement and solution direction; use
   `/grill-me`.
 - Do not create a new spec; use `/to-spec`.
 - Do not create an ExecPlan; use `/to-plan`.
@@ -363,4 +363,4 @@ When `/clarify` is implemented, verification should include:
   because it matches the post-spec clarification stage and keeps naming aligned
   with the referenced spec-kit workflow.
 - [ASSUMED] Five high-impact questions per pass is enough for the first
-  implementation because deeper pressure testing belongs to `/grill-me`.
+  implementation because deeper decision review belongs to `/grill-me`.

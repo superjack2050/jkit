@@ -2,11 +2,11 @@
 
 > Status: draft
 > Product: jkit v2
-> Scope: pressure-test selected requirements and solution directions before `/to-spec`
+> Scope: review selected requirements and solution directions before `/to-spec`
 
 ## 1. Summary
 
-`/grill-me` is an optional pre-spec command that pressure-tests a selected
+`/grill-me` is an optional pre-spec command that reviews a selected
 requirement and solution direction, one question at a time, until the key
 decision branches are clear enough for `/to-spec`.
 
@@ -16,18 +16,18 @@ It usually follows `/explore`:
 /map-init -> /explore -> /grill-me -> /to-spec -> /to-plan -> /run -> /map-repair
 ```
 
-`/grill-me` should follow the spirit of the referenced grilling workflow:
-interview the user about the requirement and solution direction, walk the
-decision tree one branch at a time, provide a recommended answer for each
-question, and answer from the project base before asking the user when local
-evidence is available.
+`/grill-me` should follow the spirit of the referenced decision-review
+workflow: interview the user about the requirement and solution direction,
+walk the decision tree one branch at a time, provide a recommended answer for
+each question, and answer from the project base before asking the user when
+local evidence is available.
 
 ## 2. Background
 
 jkit now has `/explore` specified as the lightweight stage for needs discussion,
 solution exploration, option comparison, and recommended direction selection.
-Some selected directions still need sharper pressure before they are safe to
-turn into a durable spec. `/grill-me` owns that pressure-testing step.
+Some selected directions still need sharper review before they are safe to turn
+into a durable spec. `/grill-me` owns that decision-review step.
 
 The command is not a free-form brainstorm. It starts from an already selected
 requirement or solution direction, often produced by `/explore`, and probes the
@@ -40,7 +40,7 @@ surfaces, `/grill-me` should inspect them instead of asking the user.
 
 ## 3. Goals
 
-- Pressure-test a selected requirement and solution direction before
+- Review a selected requirement and solution direction before
   `/to-spec`.
 - Usually continue from `/explore`, while also supporting direct user input.
 - Combine user conversation with targeted project-base evidence.
@@ -72,7 +72,7 @@ surfaces, `/grill-me` should inspect them instead of asking the user.
 ### 5.1 Continue from `/explore`
 
 As a user who selected a direction through `/explore`, I can run `/grill-me`
-and have the agent pressure-test that direction before writing a spec.
+and have the agent review that direction before writing a spec.
 
 Acceptance criteria:
 
@@ -95,7 +95,7 @@ Acceptance criteria:
 - The command uses explicit input as the primary requirement or direction.
 - The command restates the requirement and solution direction before probing.
 - The command asks one concise question if the input lacks enough substance to
-  identify what is being grilled.
+  identify the selected direction under review.
 - The command does not invent missing project facts.
 - The command records unresolved important facts as open questions in the
   handoff.
@@ -122,7 +122,7 @@ Acceptance criteria:
 
 ### 5.4 Ask one question at a time
 
-As a user, I want the command to pressure-test the idea without dumping a long
+As a user, I want the command to review the idea without dumping a long
 questionnaire.
 
 Acceptance criteria:
@@ -191,7 +191,7 @@ Default behavior:
   broad exploration:
 
 ```text
-What requirement and solution direction should I pressure-test?
+What requirement and solution direction should I review?
 ```
 
 - Build a decision tree for the selected requirement and direction.
@@ -357,7 +357,7 @@ When `/grill-me` is implemented later, verification should include:
 
 - `docs/specs/grill-me.md` exists.
 - `docs/specs/index.md` lists `grill-me.md`.
-- The spec defines `/grill-me` as a pre-spec pressure-testing command for
+- The spec defines `/grill-me` as a pre-spec decision-review command for
   selected requirements and solution directions.
 - The spec says `/grill-me` usually continues from `/explore`.
 - The spec requires targeted project-base evidence before user questions when
@@ -374,7 +374,7 @@ When `/grill-me` is implemented later, verification should include:
 ## 11. Open questions
 
 - [ASSUMED] The first implementation does not edit files by default because
-  `/grill-me` is a pre-spec pressure-testing conversation.
+  `/grill-me` is a pre-spec decision-review conversation.
 - [ASSUMED] The first implementation uses `/grill-me` as the only command name
   because the user asked to preserve the referenced command as closely as
   practical.

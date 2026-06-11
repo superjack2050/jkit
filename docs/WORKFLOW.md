@@ -33,7 +33,7 @@ Done when:
 3. Use `/explore` when the request is a rough requirement or needs solution
    direction comparison before spec writing.
 4. Use `/grill-me` when a selected requirement or solution direction needs
-   one-question-at-a-time pressure testing before spec writing.
+   one-question-at-a-time decision review before spec writing.
 5. Use `/to-spec` or update a spec under `docs/specs/` for new command
    behavior.
 6. Use `/clarify` when an existing spec has blocking ambiguity that would force
@@ -71,6 +71,26 @@ clear complex work -> full spec -> full active ExecPlan -> /run
 
 Complexity is allowed when it is represented in durable artifacts and
 verification. Unresolved ambiguity is not allowed to pass into implementation.
+
+Contract ownership:
+
+- `/to-done` turns user intent into durable workflow artifacts: an intent brief,
+  a behavior spec, and an active ExecPlan.
+- `/to-spec` owns the behavior contract.
+- `/to-plan` owns the durable execution contract.
+- `/run` owns the executable runtime goal contract: selected work queue,
+  execution strategy, verification loop, stop conditions, and any Codex
+  `/goal` objective.
+
+Do not pass raw `/to-done` intent directly to Codex `/goal`. If goal tracking
+is useful, `/run` derives the objective from the selected active ExecPlan.
+`/to-done` handoffs prefer Codex `/goal` after a verifiable active ExecPlan is
+ready; direct `/run` uses automatic eligibility or explicit user/plan
+direction.
+
+Goal tracking eligibility requires one objective, an evidence-based done
+condition, an adaptive validation loop, explicit boundaries, and safe bounded
+autonomy. Do not use task length or session count as the deciding factor.
 
 ## Verification Ladder
 

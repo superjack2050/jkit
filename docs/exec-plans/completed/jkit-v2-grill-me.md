@@ -2,11 +2,11 @@
 
 > Status: completed
 > Spec: `docs/specs/grill-me.md`
-> Scope: implement `/grill-me` as the pre-spec pressure-testing command
+> Scope: implement `/grill-me` as the pre-spec decision-review command
 
 ## Goal
 
-Ship `/grill-me` as the jkit v2 pre-spec command that pressure-tests a selected
+Ship `/grill-me` as the jkit v2 pre-spec command that reviews a selected
 requirement and solution direction, one question at a time, using targeted
 project-base evidence before asking the user, and then produces ready input for
 `/to-spec`.
@@ -65,7 +65,7 @@ Implement `/grill-me` using the existing command pattern:
 
 - `skills/grill-me/SKILL.md` contains the full workflow instructions:
   orientation, selected-direction resolution, targeted project-base scan,
-  decision-tree construction, one-question-at-a-time pressure testing, stop
+  decision-tree construction, one-question-at-a-time decision review, stop
   conditions, safety rules, and handoff.
 - `commands/grill-me.md` is a thin plugin command wrapper that delegates to the
   skill and names the final handoff shape.
@@ -73,7 +73,7 @@ Implement `/grill-me` using the existing command pattern:
 - README, AGENTS, workflow docs, metadata, and map config list `/grill-me` as a
   shipped command only after the skill and wrapper exist.
 
-The first version is a pre-spec pressure-testing conversation. It may inspect
+The first version is a pre-spec decision-review conversation. It may inspect
 targeted project-base evidence, but it does not edit files by default.
 
 ## Checklist

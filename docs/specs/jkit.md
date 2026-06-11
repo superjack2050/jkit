@@ -41,7 +41,7 @@ When the user asks for help with jkit:
 - Use `/explore` when the requirement is rough or solution direction is not
   selected.
 - Use `/grill-me` when a selected direction still needs requirement and
-  solution pressure testing.
+  solution decision review.
 - Use `/to-spec` when the behavior should become a durable spec.
 - Use `/clarify` when one existing spec has planning-blocking ambiguity.
 - Use `/to-plan` when one reviewable spec is ready to become an ExecPlan.

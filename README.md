@@ -95,12 +95,31 @@ jkit update-check
                                                \-> /to-done ->/
 ```
 
+### 常见工作流
+
+| 场景 | 推荐路径 |
+|---|---|
+| 新仓库或仓库缺少 agent map | `/map-init` |
+| 需求还粗、方向没选定 | `/explore` -> `/to-done` |
+| 方向已选定，但关键决策还不清楚 | `/grill-me` -> `/to-spec` -> `/to-done <spec>` |
+| 需求已经清楚，想直接做到 verified done | `/to-done <intent>` |
+| 已经有 spec，想继续做到完成 | `/to-done <spec>` |
+| 已经有 active ExecPlan，只执行计划 | `/run <plan>` |
+| 已有 spec 但存在阻塞计划的问题 | `/clarify <spec>` -> `/to-plan <spec>` -> `/run <plan>` |
+
+默认心智模型：
+
+- 不清楚先 `/explore`。
+- 清楚就 `/to-done`。
+- 已有 active plan 就 `/run`。
+- 需要人工审阅 spec 时，先 `/to-spec`，确认后再 `/to-done <spec>`。
+
 ### 需求探索与方案成形
 
 当需求还比较粗时使用 `/explore`。它用于探讨需求、比较方案方向、识别风险，
 并生成推荐方向和可交给 `/to-spec` 的输入。
 
-当方向已经选定但关键决策还没问透时使用 `/grill-me`。它逐问追问范围、
+当方向已经选定但关键决策还不清楚时使用 `/grill-me`。它逐步澄清范围、
 边界、验收和验证信号，并生成可交给 `/to-spec` 的输入。
 
 ### Spec 编写与澄清
@@ -134,7 +153,7 @@ verification loop、decisions、progress log 和 rollback notes。
 | `/jkit` 或 `$jkit` | 显示 jkit 工作流帮助，列出可用命令，并根据当前状态路由到下一步 |
 | `/map-init` | 初始化仓库级 agent map，补齐 agent 可读的项目入口、工作流、记录和验证规则 |
 | `/explore` | 探讨粗需求、比较方案方向，并生成可交给 `/to-spec` 的输入；启发自 [`obra/superpowers`](https://github.com/obra/superpowers) 的 `brainstorming` |
-| `/grill-me` | 逐问追问已选需求和方案方向，澄清关键决策，并生成可交给 `/to-spec` 的输入；启发自 [`mattpocock/skills`](https://github.com/mattpocock/skills) 的 `/grill-me` |
+| `/grill-me` | 逐步审查已选需求和方案方向，澄清关键决策，并生成可交给 `/to-spec` 的输入；启发自 [`mattpocock/skills`](https://github.com/mattpocock/skills) 的 `/grill-me` |
 | `/clarify` | 澄清一个已有 spec 中阻塞 `/to-plan` 的需求或验收问题，并把结果写回 spec；启发自 [`github/spec-kit`](https://github.com/github/spec-kit) 的 `/speckit.clarify` |
 | `/to-spec` | 从明确输入、当前会话上下文或 repo/project base 创建或更新可 review 的 spec |
 | `/to-plan` | 把可 review 的 spec 转成带 Checklist 和 Verification Loop 的 active ExecPlan |

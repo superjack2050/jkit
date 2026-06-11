@@ -2,9 +2,9 @@
 name: grill-me
 version: 0.1.0
 description: |
-  Pressure-test a selected requirement and solution direction before /to-spec.
+  Review a selected requirement and solution direction before /to-spec.
   Use when the user asks for /grill-me, grill me, challenge this direction,
-  pressure-test this requirement, or continue from /explore to make the
+  review this requirement, or continue from /explore to make the
   decision tree clear enough for a spec.
 
   This is not brainstorming, spec-writing, planning, or implementation. It uses
@@ -19,15 +19,15 @@ allowed-tools:
   - AskUserQuestion
 ---
 
-# Grill Me - Pressure-Test A Selected Direction
+# Grill Me - Review A Selected Direction
 
-`/grill-me` is the pre-spec pressure-testing stage in the jkit v2 workflow:
+`/grill-me` is the pre-spec decision-review stage in the jkit v2 workflow:
 
 ```text
 /map-init -> /explore -> /grill-me -> /to-spec -> /clarify -> /to-plan -> /run
 ```
 
-The job is to pressure-test a selected requirement and solution direction, one
+The job is to review a selected requirement and solution direction, one
 decision branch at a time, until it is clear enough for `/to-spec`. Do not
 explore broad solution spaces from scratch, write specs, create ExecPlans,
 implement code, or ask endless questions after the direction is spec-ready.
@@ -41,7 +41,7 @@ implement code, or ask endless questions after the direction is spec-ready.
 3. **One question at a time.** Ask exactly one question per turn.
 4. **Recommend an answer.** Every question must include a recommended answer and
    why it is the default.
-5. **Pressure-test requirements and solution direction.** Focus on scope,
+5. **Review requirements and solution direction.** Focus on scope,
    behavior, users, constraints, edge cases, safety, compatibility, acceptance,
    and verification.
 6. **Avoid technical planning drift.** Implementation details matter only when
@@ -67,7 +67,7 @@ First-class flows:
 If no selected direction exists, ask:
 
 ```text
-What requirement and solution direction should I pressure-test?
+What requirement and solution direction should I review?
 ```
 
 If the user only has a rough idea or broad option space, recommend `/explore`
@@ -115,7 +115,7 @@ Resolve:
 - known constraints
 
 Stop and ask one concise question if the input lacks enough substance to know
-what is being grilled.
+which selected direction is under review.
 
 Recommend `/explore` when:
 

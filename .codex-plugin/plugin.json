@@ -1,7 +1,7 @@
 {
   "name": "jkit",
-  "version": "0.9.5",
-  "description": "Agent-map toolkit for Codex and Claude Code. Initializes repository harnesses, explores, pressure-tests and clarifies requirements, writes specs, creates plans, adaptively routes intent to done, and drives active plans through verified goal loops.",
+  "version": "0.9.6",
+  "description": "Agent-map toolkit for Codex and Claude Code. Initializes repository harnesses, explores, reviews and clarifies requirements, writes specs, creates plans, adaptively routes intent to done, and drives active plans through verified goal loops.",
   "author": {
     "name": "jack.xie",
     "email": "nobodyjack2050@gmail.com",
@@ -35,7 +35,7 @@
   "interface": {
     "displayName": "jkit",
     "shortDescription": "Agent-map workflows for exploration, specs, plans, and verified runs",
-    "longDescription": "jkit helps Codex and Claude Code work from durable repository maps: initialize an agent-readable harness, explore rough requirements, pressure-test selected directions, clarify blocking spec ambiguity, turn intent into specs, create executable plans, adaptively route intent to verified done, and run active plans through review and verification.",
+    "longDescription": "jkit helps Codex and Claude Code work from durable repository maps: initialize an agent-readable harness, explore rough requirements, review selected directions, clarify blocking spec ambiguity, turn intent into specs, create executable plans, adaptively route intent to verified done, and run active plans through review and verification.",
     "developerName": "jack.xie",
     "category": "Developer Tools",
     "capabilities": [

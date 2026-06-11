@@ -7,7 +7,7 @@ description: |
   spec plannable, or continue after /to-spec when planning would otherwise need
   to invent decisions.
 
-  This is not broad exploration, pre-spec pressure testing, spec creation,
+  This is not broad exploration, pre-spec decision review, spec creation,
   planning, or implementation. It reads the repository agent map, resolves
   exactly one existing spec, uses targeted project-base evidence before asking
   the user, asks or resolves at most five high-impact clarification questions
@@ -36,7 +36,7 @@ workflow:
 
 The job is to resolve blocking ambiguity in exactly one existing spec, update
 that spec with the resolved decisions, and say whether it is ready for
-`/to-plan`. Do not discover broad directions, pressure-test an unwritten
+`/to-plan`. Do not discover broad directions, review an unwritten
 requirement, create a new spec, create an ExecPlan, implement code, or hide
 clarifications in chat history.
 
@@ -347,7 +347,7 @@ Stop and ask one concise question when:
 Stop and recommend another command when:
 
 - the user has only a rough idea or broad option space: `/explore`
-- the user has a selected pre-spec direction that still needs pressure testing:
+- the user has a selected pre-spec direction that still needs decision review:
   `/grill-me`
 - no spec exists for the behavior: `/to-spec`
 - the spec is plannable and ready for execution planning: `/to-plan <spec-slug>`

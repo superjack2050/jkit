@@ -45,7 +45,7 @@ Recommended flow:
 Use:
 - /map-init when this repo needs an agent map
 - /explore when the requirement is rough
-- /grill-me when a selected direction needs pressure testing
+- /grill-me when a selected direction needs decision review
 - /to-spec when behavior should become a reviewable spec
 - /clarify when an existing spec blocks planning
 - /to-plan when a spec is ready for an executable plan
@@ -64,7 +64,7 @@ short by default.
 
 - If there is no agent map in the current repository, recommend `/map-init`.
 - If the user has a rough idea, recommend `/explore`.
-- If the user has selected a direction but needs pressure testing, recommend
+- If the user has selected a direction but needs decision review, recommend
   `/grill-me`.
 - If the user wants durable behavior, recommend `/to-spec`.
 - If the user points at an existing ambiguous spec, recommend `/clarify`.

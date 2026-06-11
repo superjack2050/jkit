@@ -61,6 +61,19 @@ Use this guide when `/map-init` creates or augments repository map files.
 - Not a source of truth.
 - Must identify the generation script.
 
+`docs/design-docs/`
+
+- Durable design context for architecture decisions, interfaces, data models,
+  and prototypes.
+- `index.md` is the router for design artifacts and creation rules.
+- `adr/README.md` is part of the standard scaffold for long-lived architecture
+  and workflow decisions.
+- `api-contracts/`, `data-models/`, and `prototypes/` are evidence-based
+  additions. Create them only when project files, existing docs, or user intent
+  show they are useful.
+- Evidence-based design subdirectories should include a `README.md`; do not
+  create empty placeholder directories.
+
 ## Scaffold sizing
 
 Use `minimal` for tiny repos, prototypes, or empty projects where the user wants

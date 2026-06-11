@@ -15,7 +15,7 @@ Overall: 8 / 10
 - `/explore` has a command skill, wrapper, map-aware lightweight exploration
   rules, and `/to-spec` handoff requirements.
 - `/grill-me` has a command skill, wrapper, targeted project-base evidence
-  rules, one-question-at-a-time pressure testing, and `/to-spec` handoff
+  rules, one-question-at-a-time decision review, and `/to-spec` handoff
   requirements.
 - `/clarify` has a command skill, wrapper, targeted project-base evidence
   rules, at-most-five planning-blocking questions, spec-update behavior, and

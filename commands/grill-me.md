@@ -15,7 +15,7 @@ Pressure-test one selected requirement and solution direction:
 - Resolve decision branches that affect scope, behavior, safety, data,
   compatibility, acceptance criteria, verification, or workflow contracts.
 - Do not explore broad option spaces, write specs, create ExecPlans, edit
-  files, implement code, or run verification as part of normal grilling.
+  files, implement code, or run verification as part of this review.
 - Recommend `/explore`, `/clarify`, `/to-spec`, or `/to-spec --update` when a
   different command is a better fit.
 

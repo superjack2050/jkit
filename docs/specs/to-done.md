@@ -23,7 +23,7 @@ It is an orchestration command in the jkit v2 workflow:
                   \---------------------- /to-done ---------------------->/
 ```
 
-`/to-done` does not skip requirements exploration, pressure testing,
+`/to-done` does not skip requirements exploration, decision review,
 clarification, specs, plans, or `/run`. It chooses the shortest safe path based
 on current readiness:
 
@@ -40,6 +40,16 @@ The command may use conversation context to start, but it must not rely on chat
 history to finish. Before implementation begins, the request must exist as a
 spec and an active ExecPlan sized to the work. Done means reviewed, repaired,
 verified, recorded, and moved to completed when appropriate.
+
+`/to-done` does not create a Codex `/goal` objective from raw user intent. It
+materializes durable workflow artifacts: an intent brief, a behavior spec, and
+an active ExecPlan. `/run` later derives the executable runtime goal contract
+from the selected active ExecPlan when goal tracking is useful.
+
+After `/to-done` has produced or selected a verifiable active ExecPlan, its
+handoff to `/run` should prefer Codex `/goal` tracking by default. `/run` still
+owns the objective text and must decline goal tracking when the plan is not
+eligible for an evidence-based continuation loop.
 
 ## 2. Background
 
@@ -63,6 +73,16 @@ The key distinction is:
   verification
 - unresolved ambiguity is not allowed to pass into implementation
 
+Contract ownership:
+
+- Intent brief: `/to-done` restates user intent, readiness, boundaries, and
+  verification signals before durable writing.
+- Behavior contract: `/to-spec` owns the spec.
+- Durable execution contract: `/to-plan` owns the active ExecPlan.
+- Runtime goal contract: `/run` owns the selected work queue, execution
+  strategy, verification loop, stop conditions, and any Codex `/goal`
+  objective.
+
 ## 3. Goals
 
 - Accept an intent from current conversation context, a brief, a spec, or a
@@ -76,6 +96,11 @@ The key distinction is:
   clear small work and a full plan for complex work.
 - Delegate execution semantics and execution-strategy selection to `/run`
   rather than inventing a second execution loop.
+- Leave executable runtime goal contract creation to `/run`, including any
+  Codex `/goal` objective.
+- Prefer Codex `/goal` tracking after `/to-done` reaches a verifiable active
+  ExecPlan, while preserving `/run` as the owner of the objective and
+  eligibility decision.
 - Review, repair, and verify before claiming done.
 - Record progress, verification, failures, and map updates durably.
 - Move completed plans to `docs/exec-plans/completed/` after final
@@ -99,6 +124,12 @@ The key distinction is:
 - Do not mark work done when verification is missing, skipped, failing, or
   blocked.
 - Do not execute an existing active plan differently from `/run`.
+- Do not pass raw user intent or a pre-plan brief directly to Codex `/goal`.
+- Do not choose the final goal-tracking result, delegation, or work-queue scope
+  inside `/to-done`; those are `/run` execution-strategy decisions.
+- Do not force Codex `/goal` when `/run` finds no clear objective,
+  evidence-based done condition, adaptive validation loop, explicit
+  boundaries, or safe bounded autonomy.
 
 ## 5. User stories
 
@@ -112,6 +143,8 @@ Acceptance criteria:
 
 - The command extracts goal, scope, non-goals, acceptance criteria, and
   verification from the current session.
+- The extracted session context is treated as an intent brief for spec and plan
+  materialization, not as a Codex `/goal` objective.
 - The command asks one concise question when it cannot safely restate the work.
 - The command writes a minimal spec before creating a plan.
 - The command writes a minimal active ExecPlan before implementation.
@@ -144,8 +177,8 @@ the request is not ready for implementation.
 Acceptance criteria:
 
 - If the need or solution direction is rough, the command enters `/explore`.
-- If a direction is selected but requirements or solution assumptions have not
-  been pressure-tested, the command enters `/grill-me`.
+- If a direction is selected but key requirement or solution decisions are not
+  settled, the command enters `/grill-me`.
 - If behavior is clear enough for durable writing but no spec exists, the
   command enters `/to-spec`.
 - If behavior is unclear, the command enters `/to-spec` or asks the minimum
@@ -232,7 +265,7 @@ Stage routing:
 
 - No agent map: stop and suggest `/map-init`.
 - Rough need or unselected solution direction: enter `/explore`.
-- Selected direction that has not been pressure-tested: enter `/grill-me`.
+- Selected direction with unresolved key decision branches: enter `/grill-me`.
 - Clear behavior with no durable spec: enter `/to-spec`.
 - Existing spec with planning-blocking ambiguity: enter `/clarify <spec-slug>`.
 - Plannable spec with no active plan: enter `/to-plan <spec-slug>`.
@@ -316,7 +349,7 @@ instead of continuing inside `/to-done` as a black box:
 
 - `/explore`: explore the need and solution directions, then return with ready
   input for `/grill-me` or `/to-spec`.
-- `/grill-me`: pressure-test the selected requirement and solution direction,
+- `/grill-me`: review the selected requirement and solution direction,
   then return with ready input for `/to-spec`.
 - `/to-spec`: create or update the durable behavior spec.
 - `/clarify`: resolve blocking ambiguity in one existing spec before planning.
@@ -327,9 +360,9 @@ instead of continuing inside `/to-done` as a black box:
 Each transition must be visible to the user:
 
 ```text
-This can continue through /to-done, but the selected direction has not been
-pressure-tested yet. I am entering /grill-me to fill that context before
-writing the spec.
+This can continue through /to-done, but the selected direction still has
+unresolved key decision branches. I am entering /grill-me to fill that context
+before writing the spec.
 ```
 
 ### 8.5 Materialize or reuse the spec
@@ -377,7 +410,12 @@ Every plan must follow `docs/PLANS.md` and include:
 
 After the active plan exists and is ready, use `/run` semantics:
 
-- let `/run` decide and record execution strategy before implementation
+- request `/run` to prefer Codex `/goal` tracking for `/to-done` handoffs when
+  the active plan is eligible
+- let `/run` decide and record the final execution strategy before
+  implementation
+- let `/run` derive the executable runtime goal contract from the active
+  ExecPlan, selected work queue, verification, and stop conditions
 - treat Codex `/goal` and subagents as `/run` runtime choices, not
   `/to-done` shortcuts
 - execute ready pending checklist items
@@ -389,6 +427,17 @@ After the active plan exists and is ready, use `/run` semantics:
 - mark checklist items complete only after focused verification passes
 
 `/to-done` must not maintain a divergent execution loop.
+
+`/to-done` may hand `/run` the selected plan or readiness path, but it must not
+precompute the Codex `/goal` objective. If goal tracking is selected, `/run`
+creates the objective from the active ExecPlan so the durable plan remains the
+source of truth.
+
+Goal tracking is eligible only when the active ExecPlan has one objective, an
+evidence-based done condition, an adaptive validation loop, explicit
+boundaries, and safe bounded autonomy. If any of those are missing, `/run`
+records why goal tracking was skipped and continues with normal plan execution
+or stops at the blocker.
 
 ### 8.8 Update maps and records
 
@@ -509,6 +558,12 @@ Dogfood verification should cover:
 - `/to-done` uses minimal artifacts only for clear small work.
 - `/to-done` uses full artifacts for complex work.
 - `/to-done` delegates execution to `/run` semantics.
+- `/to-done` does not create Codex `/goal` objectives or decide the final
+  goal-tracking result.
+- `/run` derives any executable runtime goal contract after resolving the
+  active ExecPlan and work queue.
+- `/to-done` handoffs ask `/run` to prefer Codex `/goal` tracking when the
+  active ExecPlan is eligible.
 - `/to-done` refuses unresolved ambiguity, risky work, or unverifiable work.
 - `/to-done` records verification failures exactly and does not claim done when
   checks fail.
@@ -531,4 +586,9 @@ Dogfood verification should cover:
   fields needed for future agents to continue without chat history.
 - [ASSUMED] Full specs and plans are required when complexity affects behavior,
   architecture, compatibility, distribution, safety, or verification.
+- [ASSUMED] Codex `/goal` receives a runtime objective derived by `/run` from
+  the active ExecPlan, not the original `/to-done` intent brief.
+- [ASSUMED] `/to-done` expresses a stronger user intent to pursue verified
+  completion than direct `/run`, so its `/run` handoff should prefer goal
+  tracking when evidence-loop eligibility is satisfied.
 - [ASSUMED] An explicit preview mode can be specified separately later.

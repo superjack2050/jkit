@@ -25,7 +25,7 @@ branch-by-branch interrogation.
 jkit already has durable stages for spec writing, planning, execution, and map
 repair. The missing front-end stage is a small demand-discovery and option
 exploration command for requests that are too rough for `/to-spec` but do not
-need the heavier pressure-testing expected from `/grill-me`.
+need the heavier decision review expected from `/grill-me`.
 
 The command is inspired by the lightweight part of brainstorming workflows: ask
 only the questions that improve direction selection, explore a few viable
@@ -53,8 +53,8 @@ approaches, recommend one, and hand the user a clear next command.
 - Do not implement code, package changes, command wrappers, tests, or runtime
   behavior.
 - Do not replace `/to-done` for clear, bounded work.
-- Do not perform exhaustive questioning; `/grill-me` should own deep
-  branch-by-branch pressure testing of selected requirements and solution
+- Do not perform exhaustive questioning; `/grill-me` should own deeper
+  branch-by-branch review of selected requirements and solution
   directions.
 - Do not resolve gaps in an already-created spec; `/clarify` should own
   post-spec clarification before `/to-plan`.
@@ -112,7 +112,7 @@ Acceptance criteria:
   affected surfaces when useful for option comparison.
 - The command recommends `/to-spec` once the direction is selected.
 - The command recommends `/grill-me` when the selected direction still needs
-  deep decision-tree pressure testing.
+  deep decision-tree review.
 - The command recommends `/clarify` only for an existing spec that is not yet
   plannable.
 

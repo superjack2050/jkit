@@ -8,7 +8,7 @@ Specs define command behavior and user-visible workflow contracts.
   `/to-plan`.
 - `explore.md`: discuss rough needs, explore solution directions, and produce
   ready input for `/to-spec`.
-- `grill-me.md`: pressure-test selected requirements and solution directions
+- `grill-me.md`: review selected requirements and solution directions
   before `/to-spec`.
 - `jkit.md`: provide the root help and routing entry for the jkit workflow.
 - `map-init.md`: initialize repository agent maps.

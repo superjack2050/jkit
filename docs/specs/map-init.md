@@ -44,6 +44,9 @@ repository to act as a record system for agents.
 - Create a long-running task structure that survives chat history loss.
 - Create places for specs, plans, playbooks, generated indexes, references,
   incidents, verification failures, and workflow exceptions.
+- Create a design-docs entry point and ADR area by default, while adding
+  API contract, data model, and prototype areas only when project evidence or
+  user intent warrants them.
 - Create or recommend mechanical commands for map generation, map checking,
   and project verification.
 - Support empty projects, existing codebases, and repos that already have some
@@ -200,7 +203,7 @@ docs/RELIABILITY.md
 docs/QUALITY_SCORE.md
 docs/specs/index.md
 docs/design-docs/index.md
-docs/design-docs/adr/
+docs/design-docs/adr/README.md
 docs/playbooks/README.md
 docs/records/workflow-exceptions/
 docs/records/verification-failures/
@@ -221,6 +224,30 @@ scripts/agent-map-smoke
 
 If a project already has equivalent commands, jkit records them instead of
 creating duplicate scripts.
+
+Standard scaffolds always seed the design-docs navigation layer and ADR area.
+They do not create every possible design subdirectory by default. `/map-init`
+creates these evidence-based additions only when discovered project files,
+existing docs, or user intent make them useful:
+
+```text
+docs/design-docs/api-contracts/README.md
+docs/design-docs/data-models/README.md
+docs/design-docs/prototypes/README.md
+```
+
+Creation triggers:
+
+- `api-contracts/`: stable API, SDK, route, controller, RPC, GraphQL,
+  webhook, client, OpenAPI, or compatibility-sensitive integration evidence.
+- `data-models/`: database schema, migration, ORM, persistence, domain model,
+  field semantics, or storage compatibility evidence.
+- `prototypes/`: frontend, product/UI, design system, Storybook, HTML
+  prototype, interaction design, or user-supplied product exploration evidence.
+
+If the project might need one of these areas but evidence is not clear,
+`/map-init` records a `[NEEDS_INVESTIGATION]` item instead of creating a
+misleading empty directory.
 
 ## 7. Document design
 
@@ -330,6 +357,26 @@ Rules:
 - They must not contain secrets.
 - They must not become the canonical source of truth.
 
+### 7.7 docs/design-docs/
+
+Purpose: durable design context that helps future agents understand decisions,
+interfaces, models, and prototypes.
+
+Rules:
+
+- `docs/design-docs/index.md` is the design-docs router. It explains which
+  design artifacts exist, when to create new ones, and where future agents
+  should look before changing architecture, APIs, data, or UI behavior.
+- `docs/design-docs/adr/README.md` is part of the standard scaffold because
+  long-lived architecture and workflow decisions are broadly useful across
+  project types.
+- `api-contracts/`, `data-models/`, and `prototypes/` are created only from
+  project evidence or explicit user intent.
+- Evidence-based design subdirectories must include a `README.md` explaining
+  their scope and update rules. Do not create empty directories as placeholders.
+- If the need for a design subdirectory is plausible but unclear, record the
+  question in `docs/records/open-questions.md`.
+
 ## 8. Ambiguity rules
 
 `/map-init` must continue jkit's ambiguity discipline.
@@ -407,6 +454,11 @@ Expected changes after implementation:
 - `docs/records/open-questions.md` exists and captures unresolved decisions.
 - `agent-map.yaml` exists and includes command/update-rule placeholders.
 - The command supports at least `minimal` and `standard` scaffold levels.
+- The standard scaffold includes `docs/design-docs/index.md` and
+  `docs/design-docs/adr/README.md`.
+- API contract, data model, and prototype design-docs areas are created only
+  when project evidence or user intent warrants them, otherwise uncertain needs
+  are recorded as open questions.
 - The command does not require network access.
 - The command leaves a clear next step: usually `/to-spec`.
 

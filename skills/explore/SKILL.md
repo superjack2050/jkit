@@ -149,7 +149,7 @@ Continue with `/explore` when:
 Recommend another command when clearer:
 
 - clear, bounded, low-risk work: `/to-done`
-- selected direction still needs decision-tree pressure testing: `/grill-me`
+- selected direction still needs decision-branch review: `/grill-me`
 - existing spec is not plannable: `/clarify <spec-slug>`
 - idea is already spec-ready: `/to-spec`
 
@@ -241,7 +241,7 @@ Stop and ask one concise question when:
 Stop and recommend another command when:
 
 - the idea is already clear and bounded enough for `/to-done`
-- the selected direction needs deep pressure testing by `/grill-me`
+- the selected direction needs deeper decision review by `/grill-me`
 - an existing spec needs post-spec clarification by `/clarify`
 - the idea is already ready for `/to-spec`
 

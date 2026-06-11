@@ -56,7 +56,7 @@ wording that should change only once `/clarify` is shipped.
 ## Non-goals
 
 - Do not turn `/clarify` into broad idea exploration; `/explore` owns that.
-- Do not turn `/clarify` into pre-spec pressure testing; `/grill-me` owns that.
+- Do not turn `/clarify` into pre-spec decision review; `/grill-me` owns that.
 - Do not create new specs from loose intent; `/to-spec` owns new specs.
 - Do not create ExecPlans; `/to-plan` owns planning.
 - Do not implement product code, migrations, tests for product behavior, or

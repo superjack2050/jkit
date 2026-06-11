@@ -111,6 +111,12 @@ Infer:
 - source directories
 - existing docs
 - existing verification commands
+- API boundary signals such as routes, controllers, SDKs, OpenAPI, GraphQL,
+  RPC, webhooks, clients, or compatibility-sensitive integrations
+- data model signals such as schemas, migrations, ORM models, persistence,
+  field semantics, or storage compatibility surfaces
+- prototype signals such as frontend apps, design systems, Storybook, HTML
+  prototypes, product/UI docs, or interaction design artifacts
 - sensitive config paths
 - generated-artifact paths
 - whether the repo already has agent guidance
@@ -196,7 +202,7 @@ docs/RELIABILITY.md
 docs/QUALITY_SCORE.md
 docs/specs/index.md
 docs/design-docs/index.md
-docs/design-docs/adr/
+docs/design-docs/adr/README.md
 docs/playbooks/README.md
 docs/exec-plans/tech-debt-tracker.md
 docs/records/workflow-exceptions/
@@ -206,6 +212,28 @@ docs/references/
 scripts/agent-map-generate
 scripts/agent-map-check
 ```
+
+Standard also supports evidence-based design-docs additions. Create these only
+when discovered project files, existing docs, or user intent make them useful:
+
+```text
+docs/design-docs/api-contracts/README.md
+docs/design-docs/data-models/README.md
+docs/design-docs/prototypes/README.md
+```
+
+Use these triggers:
+
+- `api-contracts/`: stable API, SDK, route, controller, RPC, GraphQL,
+  webhook, client, OpenAPI, or compatibility-sensitive integration evidence.
+- `data-models/`: database schema, migration, ORM, persistence, domain model,
+  field semantics, or storage compatibility evidence.
+- `prototypes/`: frontend, product/UI, design system, Storybook, HTML
+  prototype, interaction design, or user-supplied product exploration evidence.
+
+If one of these areas seems plausible but is not supported by clear evidence,
+record a `[NEEDS_INVESTIGATION]` item in `docs/records/open-questions.md`
+instead of creating a misleading empty directory.
 
 Full adds, when useful:
 
@@ -250,6 +278,18 @@ sections:
 
 Keep stubs honest. Use `TBD`, `[ASSUMED]`, and `[NEEDS_INVESTIGATION]` rather
 than filling gaps with guesses.
+
+For design docs:
+
+- Keep `docs/design-docs/index.md` as the router for architecture decisions,
+  API contracts, data models, and prototypes.
+- When the selected scaffold level includes design docs, create an ADR README
+  in `docs/design-docs/adr/` for long-lived architecture and workflow
+  decisions.
+- For any evidence-based design-docs addition, create a `README.md` with
+  purpose, current state, update rules, and open questions.
+- Do not create empty API, data, or prototype directories just to mirror a
+  template.
 
 ## Phase 6 - Seed scripts
 

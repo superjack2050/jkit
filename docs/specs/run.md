@@ -25,11 +25,17 @@ is genuinely done or a clear blocker is recorded.
 
 Before editing, `/run` chooses an execution strategy from the selected
 ExecPlan. The default is single-agent execution. When the runtime supports it,
-`/run` may use Codex `/goal` for long-running goal tracking, and may use
+`/run` may use Codex `/goal` for evidence-based continuation loops, and may use
 subagents for bounded review, investigation, or isolated implementation. These
 are optional runtime capabilities, not requirements, and the primary `/run`
 agent remains accountable for final review, verification, progress logging, and
 map updates.
+
+`/run` is the only stage that derives the executable runtime goal contract.
+That contract is built from the selected active ExecPlan, referenced specs,
+ready work queue, verification loop, non-goals, and stop conditions. It may be
+passed to Codex `/goal` when goal tracking is selected, but the active ExecPlan
+remains the durable source of truth.
 
 ## 2. Goals
 
@@ -51,8 +57,10 @@ map updates.
   changes.
 - Keep late-discovered ambiguity visible instead of silently choosing.
 - Choose and record an execution strategy before implementation.
-- Use Codex `/goal` when available and useful for long-running or resumable
-  plan execution.
+- Use Codex `/goal` when available and useful for evidence-based continuation
+  loops.
+- Derive any Codex `/goal` objective from the selected active ExecPlan and
+  runtime work queue, never from raw user intent alone.
 - Use subagents only when the selected plan contains independent, low-conflict,
   verifiable work or bounded review/investigation tasks.
 - Keep the primary `/run` agent responsible for final integration, review,
@@ -74,6 +82,10 @@ map updates.
   commands and the next action.
 - Do not require Codex `/goal`; `/run` must remain portable to runtimes that
   do not expose goal-tracking features.
+- Do not accept `/to-done` chat context, raw user intent, or a pre-plan brief
+  as the executable runtime goal contract.
+- Do not let Codex `/goal` replace the active ExecPlan, progress log, review,
+  verification, or blocker records.
 - Do not spawn subagents for ambiguous, high-risk, destructive, external-live,
   secret-bearing, or tightly coupled work.
 - Do not let subagents expand the selected plan's scope, bypass approval
@@ -189,8 +201,11 @@ Acceptance criteria:
 
 - Before editing, the command classifies the selected run's execution strategy.
 - The command considers Codex `/goal` separately from subagent delegation.
-- Codex `/goal` is used only when the runtime supports it and the plan is
-  long-running, milestone-oriented, or likely to require continuation.
+- Codex `/goal` is used only when the runtime supports it and the plan has a
+  clear objective, evidence-based done condition, adaptive validation loop,
+  explicit boundaries, and safe bounded autonomy.
+- When Codex `/goal` is selected, the command derives a runtime objective from
+  the selected active ExecPlan, not from raw `/to-done` intent.
 - Subagents are used only for bounded, independent, low-conflict work with clear
   acceptance and verification signals.
 - Subagents may be used for review, investigation, or isolated implementation,
@@ -270,33 +285,51 @@ Default behavior:
 
 Before editing, decide and record the execution strategy.
 
-Execution strategy has two independent facets:
+Execution strategy has two independent facets. Goal tracking also records the
+caller preference because `/to-done` expresses a stronger "pursue verified
+completion" intent than a direct `/run` invocation:
 
 ```text
-goal tracking: none | Codex /goal
+goal tracking preference: auto | prefer Codex /goal | force Codex /goal | none
+goal tracking result: none | Codex /goal
 delegation: none | subagent review/investigation | subagent isolated implementation
 ```
 
-Default:
+Defaults:
 
 ```text
-goal tracking: none
+direct /run goal tracking preference: auto
+/to-done handoff goal tracking preference: prefer Codex /goal
 delegation: none
 ```
 
-Use Codex `/goal` when all are true:
+Use Codex `/goal` when the preference is `force Codex /goal` or `prefer Codex
+/goal`, and all eligibility checks pass. For `auto`, use Codex `/goal` only
+when the plan clearly benefits from an evidence-based continuation loop.
+
+Eligibility checks:
 
 - the current runtime supports Codex `/goal`
-- the selected plan has a clear goal and verifiable milestones
-- the work is long-running, has many checklist items, spans multiple sessions,
-  or is likely to need continuation
+- the selected plan has one clear objective
+- the done condition can be checked against concrete evidence
+- the plan has an adaptive validation loop where the next action may depend on
+  observed failures, metrics, test output, artifacts, logs, or code evidence
+- constraints, non-goals, boundaries, allowed tools or files, and stop
+  conditions are explicit
+- Codex has safe bounded autonomy to continue making scoped progress without
+  asking the user to steer every step
 - goal tracking will not replace the active ExecPlan progress log
 
 Do not use Codex `/goal` when:
 
 - the runtime does not support it
-- the run is a narrow item or small one-session change
-- the plan is ambiguous or missing verification
+- the run is a one-off focused edit that does not need a continuation loop
+- the plan is ambiguous or missing an evidence surface
+- a key product, safety, data, compatibility, or public workflow decision still
+  needs the user
+- the work is destructive, external-live, secret-bearing, or migration-heavy
+  without explicit approval and boundaries
+- the objective is an open-ended backlog rather than a finish line
 - goal state would become the only durable record of progress
 
 Use subagents for review or investigation when:
@@ -326,12 +359,49 @@ Do not use subagents when:
 
 Record in the active plan progress log before or during execution:
 
-- selected goal-tracking mode
+- selected goal-tracking preference and result
+- goal-tracking caller preference
 - selected delegation mode
 - reason for the strategy
+- runtime goal contract summary when Codex `/goal` is selected
 - subagent scopes, if any
 - how subagent output will be reviewed and verified
 - fallback reason when a useful runtime capability is unavailable
+
+When goal tracking is `Codex /goal`, create the runtime objective from this
+shape:
+
+```text
+Objective:
+Drive active ExecPlan <path-or-slug> to verified completion.
+
+Source of truth:
+- Spec: <referenced spec paths>
+- Plan: <active plan path>
+
+Scope:
+- Complete the selected ready unchecked checklist items.
+- Stay within the active plan and referenced specs.
+
+Non-goals:
+- Do not expand behavior beyond the plan.
+- Do not touch unrelated worktree changes.
+
+Done when:
+- Focused verification passes for completed checklist items.
+- The diff and behavior are reviewed against the plan and specs.
+- In-scope review findings are fixed.
+- Required final verification passes.
+- The active plan records strategy, checklist status, verification, and blockers.
+
+Stop if:
+- A missing decision affects behavior, safety, data, compatibility, public
+  workflow, irreversible operations, or verification.
+- Verification cannot pass after meaningful in-scope fixes.
+```
+
+Do not include speculative requirements or unresolved chat-only decisions in the
+runtime objective. Record unresolved facts in the active plan instead.
 
 ### 6.5 Execute pending checklist items
 
@@ -416,7 +486,7 @@ Always update the active plan:
 
 The progress log entry for each run must include:
 
-- selected execution strategy and reason
+- selected execution strategy, caller preference, and reason
 - whether Codex `/goal` was used, skipped, or unavailable
 - whether subagents were used, skipped, or unavailable
 - subagent scopes and reviewed outputs, when used
@@ -501,6 +571,8 @@ If any answer is no, record why in the plan or records before handing off.
 - `/run` chooses and records an execution strategy before implementation.
 - `/run` treats Codex `/goal` as an optional runtime goal-tracking capability,
   not as a portable requirement.
+- `/run` derives any Codex `/goal` objective from the active ExecPlan,
+  referenced specs, selected work queue, verification, and stop conditions.
 - `/run` may use subagents only for bounded, independent, verifiable work or
   review/investigation.
 - `/run` keeps the primary agent accountable for final integration, review,

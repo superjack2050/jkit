@@ -10,12 +10,17 @@ Drive an intent to verified done by choosing the shortest safe jkit path:
 - Apply the `/to-done` readiness gate.
 - Route visibly through `/explore`, `/grill-me`, `/to-spec`, `/clarify`,
   `/to-plan`, or `/run` when that stage is required.
+- Convert user intent into durable workflow artifacts: an intent brief, a
+  behavior spec, and an active ExecPlan.
 - Use minimal specs and plans only for clear small work.
 - Use full specs and plans for complex work.
 - Delegate execution semantics to `/run`; do not create a separate execution
   loop.
-- When entering `/run`, let `/run` choose and record execution strategy,
-  including optional Codex `/goal` and subagent use.
+- When entering `/run`, ask `/run` to prefer Codex `/goal` tracking for
+  eligible `/to-done` handoffs.
+- Let `/run` choose and record the final execution strategy, derive the
+  executable runtime goal contract, and decide optional Codex `/goal` or
+  subagent use.
 - Review, repair, verify, update maps, and record failures before claiming
   done.
 - Move the plan to completed only when required verification passes.
@@ -30,4 +35,5 @@ Readiness routing:
 - existing active plan: enter `/run <plan-slug>`
 
 Do not use `/to-done` to hide ambiguity, skip durable artifacts, bypass
-verification, or silently choose among consequential alternatives.
+verification, silently choose among consequential alternatives, or create a
+Codex `/goal` objective from raw user intent.

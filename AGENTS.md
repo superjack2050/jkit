@@ -17,8 +17,8 @@ the full manual. Load deeper context from `docs/` only when the task needs it.
 - `skills/map-init`: skill for initializing repository agent maps.
 - `skills/explore`: skill for discussing rough requirements, comparing
   solution directions, and producing ready `/to-spec` input.
-- `skills/grill-me`: skill for pressure-testing selected requirements and
-  solution directions before `/to-spec`.
+- `skills/grill-me`: skill for reviewing selected requirements and solution
+  directions before `/to-spec`.
 - `skills/clarify`: skill for resolving planning-blocking ambiguity in one
   existing spec before `/to-plan`.
 - `skills/to-spec`: skill for creating or updating reviewable

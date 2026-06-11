@@ -15,7 +15,8 @@ this repository. Keep `AGENTS.md` short and put durable context here.
 ## Knowledge Areas
 
 - Specs: `specs/`
-- Design docs and ADRs: `design-docs/`
+- Design docs, ADRs, and discovered contracts/models/prototypes:
+  `design-docs/`
 - Repeatable workflows: `playbooks/`
 - Active and completed plans: `exec-plans/`
 - Records and exceptions: `records/`

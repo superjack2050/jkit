@@ -154,6 +154,7 @@ docs/
   design-docs/
     index.md
     adr/
+      README.md
   playbooks/
     README.md
   exec-plans/
@@ -172,12 +173,24 @@ scripts/
   agent-map-check
 ```
 
+Conditional evidence-based additions:
+
+```text
+docs/design-docs/api-contracts/README.md
+docs/design-docs/data-models/README.md
+docs/design-docs/prototypes/README.md
+```
+
 Design note:
 
 - Prefer `docs/specs/` for the public reusable toolkit because it works for
   libraries, CLIs, infra projects, and product applications.
 - Allow projects to rename this to `docs/product-specs/` in `agent-map.yaml`
   when product-specific language fits better.
+- Always seed `docs/design-docs/index.md` and
+  `docs/design-docs/adr/README.md`. Create API contract, data model, and
+  prototype design-doc areas only when project evidence or user intent supports
+  them; otherwise record open questions instead of creating empty directories.
 
 ### Layer 4: Learning and repair loop
 
@@ -210,17 +223,22 @@ when work happened outside the workflow or an agent failed to update maps.
    Read the plan and referenced specs. Select all ready pending checklist items by
    default. Stop if dependencies are incomplete or the plan is unverifiable.
 
-4. **Execute**
+4. **Decide execution strategy**
+   Choose single-agent execution, optional Codex `/goal`, and optional subagent
+   delegation. If goal tracking is selected, derive the runtime objective from
+   the active ExecPlan, selected work queue, verification, and stop conditions.
+
+5. **Execute**
    Implement the ready pending checklist items in scope. Stop for late ambiguity
    that changes behavior, security, data, external integrations, or
    irreversible operations.
 
-5. **Review and verify**
+6. **Review and verify**
    Review the diff, fix in-scope findings, run focused checks, relevant
    `agent-map.yaml` update-rule checks, and map checks when maps changed. Rerun
    verification until it passes or a blocker is recorded.
 
-6. **Update maps**
+7. **Update maps**
    Update the active plan's checklist, progress log, decisions, verification
    result, and blockers. Record verification failures under `docs/records/`.
    Refresh generated indexes when layout or docs indexes changed.
@@ -331,6 +349,8 @@ TBD: <specific missing fact>
 - [x] Add `commands/run.md` wrapper.
 - [x] Update installer and plugin metadata to include `run`.
 - [x] Update README, AGENTS, workflow, and map config for `/run`.
+- [x] Clarify `/map-init` design-docs behavior so ADRs are standard, while
+  API contracts, data models, and prototypes are evidence-based additions.
 - [ ] Dogfood `/map-init` against three fixture repos:
   empty repo, small Node repo, and repo with existing `AGENTS.md`.
 - [ ] Dogfood `/run` against this active plan.
@@ -404,6 +424,18 @@ Expected dogfood result:
   still being dogfooded.
 - 2026-06-06: Add a lightweight `commands/map-init.md` wrapper so plugin users
   have an explicit `/jkit:map-init` entry point.
+- 2026-06-09: Standard map-init scaffolds should seed
+  `docs/design-docs/index.md` and `docs/design-docs/adr/README.md`; API
+  contract, data model, and prototype areas are evidence-based additions, not
+  default empty directories.
+- 2026-06-09: `/to-done` materializes durable workflow artifacts, while `/run`
+  owns executable runtime goal contracts. Codex `/goal` objectives must be
+  derived from the selected active ExecPlan rather than raw user intent.
+- 2026-06-10: `/to-done` handoffs should prefer Codex `/goal` tracking after a
+  verifiable active ExecPlan is ready. Direct `/run` keeps goal tracking as
+  automatic or explicit. Eligibility is based on one objective, an
+  evidence-based done condition, an adaptive validation loop, explicit
+  boundaries, and safe bounded autonomy, not task length or session count.
 
 ## Progress Log
 
@@ -449,6 +481,40 @@ Expected dogfood result:
   Verified with `./scripts/agent-map-generate`, JSON metadata parsing,
   `./scripts/agent-map-check`, `node bin/jkit.js status`, stale old-term
   wording scan, and `npm pack --dry-run`.
+- 2026-06-09: Updated the map-init spec, skill instructions, artifact guide,
+  docs README template, current design-docs index, and this active plan to make
+  ADRs the default tracked design-docs area and make API contracts, data
+  models, and prototypes conditional on project evidence or user intent.
+- 2026-06-09: Ran `./scripts/agent-map-generate`,
+  `./scripts/agent-map-check`, `node bin/jkit.js status`,
+  `./scripts/codex-plugin-check`, and `npm pack --dry-run`; all required
+  checks exited successfully. Reviewed the diff and found no in-scope follow-up
+  fixes beyond the wording split between default and conditional design-docs
+  areas.
+- 2026-06-09: Updated `/to-done` and `/run` specs, skills, command wrappers,
+  workflow docs, and this plan so `/to-done` materializes durable intent into
+  spec and ExecPlan artifacts, while `/run` derives executable runtime goal
+  contracts and optional Codex `/goal` objectives from the active ExecPlan.
+  Execution strategy for this docs run: goal tracking skipped because the
+  selected work did not need an evidence-based continuation loop; subagents
+  skipped because the touched files were tightly related. Verification passed with
+  `./scripts/agent-map-check`, `node bin/jkit.js status`,
+  `./scripts/codex-plugin-check`, and `npm pack --dry-run`. The status check
+  reported an existing Codex plugin link warning but exited
+  successfully.
+- 2026-06-10: Simulated the updated `/to-done` flow with Codex goal tracking
+  active for this requirement. Updated `/to-done` and `/run` specs, skills,
+  command wrappers, workflow docs, and this plan so `/to-done` defaults to a
+  goal-tracking preference after a verifiable active ExecPlan is ready, while
+  direct `/run` uses automatic or explicit goal tracking. Replaced task-length
+  and session-count criteria with evidence-loop eligibility. Verification
+  passed with `git diff --check`, `./scripts/agent-map-check`,
+  `node bin/jkit.js status`, `./scripts/codex-plugin-check` with a fresh
+  temporary venv, and `npm pack --dry-run`. The first
+  `./scripts/codex-plugin-check` attempt failed because the default temporary
+  validation venv lacked PyYAML; rerunning with a fresh temporary venv passed.
+  The status check reported an existing Codex plugin link warning but exited
+  successfully.
 
 ## Risks
 

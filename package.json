@@ -1,7 +1,7 @@
 {
   "name": "@nobodyjack/jkit",
-  "version": "0.9.5",
-  "description": "Agent-map toolkit for Codex and Claude Code. Initializes repository harnesses, explores, pressure-tests and clarifies requirements, writes specs, creates plans, adaptively routes intent to done, and drives active plans through verified goal loops.",
+  "version": "0.9.6",
+  "description": "Agent-map toolkit for Codex and Claude Code. Initializes repository harnesses, explores, reviews and clarifies requirements, writes specs, creates plans, adaptively routes intent to done, and drives active plans through verified goal loops.",
   "bin": {
     "jkit": "bin/jkit.js"
   },

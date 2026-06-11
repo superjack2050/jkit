@@ -39,6 +39,17 @@ Complexity is allowed. Unresolved ambiguity is not. Do not hide missing
 requirements, untested assumptions, planning blockers, or verification gaps
 inside a "done" shortcut.
 
+`/to-done` materializes durable workflow artifacts, not runtime goal tracking.
+It may turn user intent into an intent brief, a behavior spec, and an active
+ExecPlan, but it must not create a Codex `/goal` objective from raw user
+intent. `/run` derives the executable runtime goal contract from the selected
+active ExecPlan when goal tracking is useful.
+
+After `/to-done` has produced or selected a verifiable active ExecPlan, its
+handoff to `/run` should prefer Codex `/goal` tracking by default. `/run` still
+owns the objective text and must decline goal tracking when the plan is not
+eligible for an evidence-based continuation loop.
+
 ## Core Rules
 
 1. **Readiness first.** Classify the current stage before writing
@@ -57,10 +68,16 @@ inside a "done" shortcut.
 6. **Use `/run` semantics.** Execution belongs to the Goal-Driven Execution
    loop in `skills/run/SKILL.md`, including its execution strategy decision for
    optional Codex `/goal` and subagents. Do not create a second execution loop.
-7. **No risky shortcut.** Stop for unresolved safety, data, compatibility,
+7. **Do not precompute runtime goals.** Goal tracking, work-queue scope,
+   delegation, and Codex `/goal` objective creation belong to `/run`, after an
+   active ExecPlan has been selected.
+8. **Prefer goal tracking after planning.** Once `/to-done` reaches a
+   verifiable active ExecPlan, ask `/run` to prefer Codex `/goal` tracking when
+   evidence-loop eligibility is satisfied.
+9. **No risky shortcut.** Stop for unresolved safety, data, compatibility,
    package distribution, public workflow, production, external-live, or
    irreversible-operation questions.
-8. **Verification decides done.** Failed, skipped, absent, or blocked
+10. **Verification decides done.** Failed, skipped, absent, or blocked
    verification means the work is not done.
 
 ## Supported Forms
@@ -146,6 +163,9 @@ For current-session intent or an explicit brief, restate:
 - affected files, docs, skills, commands, package metadata, runtime surfaces,
   or public workflow surfaces
 
+Treat this restatement as an intent brief for durable artifacts. Do not pass it
+directly to Codex `/goal` and do not use it to decide `/run` execution strategy.
+
 Also classify the request as one of:
 
 - rough need or unselected solution direction
@@ -179,7 +199,7 @@ Readiness routing:
 
 - no agent map: stop and suggest `/map-init`
 - rough need or unselected solution direction: enter `/explore`
-- selected direction that has not been pressure-tested: enter `/grill-me`
+- selected direction with unresolved key decision branches: enter `/grill-me`
 - clear behavior with no durable spec: enter `/to-spec`
 - existing spec with planning-blocking ambiguity: enter `/clarify <spec-slug>`
 - plannable spec with no active plan: enter `/to-plan <spec-slug>`
@@ -201,7 +221,7 @@ contract:
 
 - `/explore`: discuss the need, compare solution directions, and return ready
   input for `/grill-me` or `/to-spec`.
-- `/grill-me`: pressure-test the selected requirement and solution direction
+- `/grill-me`: review the selected requirement and solution direction
   one question at a time, then return ready input for `/to-spec`.
 - `/to-spec`: create or update the durable behavior spec.
 - `/clarify`: resolve blocking ambiguity in one existing spec before planning.
@@ -326,7 +346,12 @@ Rules:
 After the active plan exists and is ready, read `skills/run/SKILL.md` and
 follow its Goal-Driven Execution loop:
 
-- let `/run` decide and record execution strategy before implementation
+- request `/run` to prefer Codex `/goal` tracking for `/to-done` handoffs when
+  the active plan is eligible
+- let `/run` decide and record the final execution strategy before
+  implementation
+- let `/run` derive the executable runtime goal contract from the active
+  ExecPlan, selected work queue, verification, and stop conditions
 - treat Codex `/goal` and subagents as `/run` runtime choices, not
   `/to-done` shortcuts
 - execute ready pending checklist items
@@ -339,6 +364,17 @@ follow its Goal-Driven Execution loop:
 - mark checklist items complete only after focused verification passes
 
 Do not maintain a divergent execution loop in `/to-done`.
+
+`/to-done` may hand `/run` the selected plan or readiness path, but it must not
+precompute the Codex `/goal` objective. If goal tracking is selected, `/run`
+creates the runtime objective from the active ExecPlan so the durable plan
+remains the source of truth.
+
+Goal tracking is eligible only when the active ExecPlan has one objective, an
+evidence-based done condition, an adaptive validation loop, explicit
+boundaries, and safe bounded autonomy. If any of those are missing, `/run`
+records why goal tracking was skipped and continues with normal plan execution
+or stops at the blocker.
 
 ## Phase 7 - Verification Loop
 
